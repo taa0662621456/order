@@ -10,13 +10,10 @@ use OrderComponent\OrderComponentBundle;
 final class TestKernel extends Kernel
 {
     public function registerBundles(): iterable
-    {
-        return [ new FrameworkBundle(), new DoctrineBundle(), new OrderComponentBundle() ];
-    }
+    { return [ new FrameworkBundle(), new DoctrineBundle(), new OrderComponentBundle() ]; }
+
     protected function configureContainer(ContainerConfigurator $c): void
     {
-        $c->import('%kernel.project_dir%/config/packages/messenger.php');
-        $c->import('%kernel.project_dir%/config/packages/test/messenger.php');
         $c->extension('framework', [
             'secret' => 'test', 'test' => true,
             'workflows' => [
@@ -25,14 +22,7 @@ final class TestKernel extends Kernel
                     'supports' => ['OrderComponent\Entity\Order'],
                     'initial_marking' => 'draft',
                     'places' => ['draft','placed','paid','shipped','completed','cancelled','refunded'],
-                    'transitions' => [
-                        'place' => ['from' => 'draft', 'to' => 'placed'],
-                        'pay' => ['from' => 'placed', 'to' => 'paid'],
-                        'ship' => ['from' => 'paid', 'to' => 'shipped'],
-                        'complete' => ['from' => 'shipped', 'to' => 'completed'],
-                        'cancel' => ['from' => ['draft','placed'], 'to' => 'cancelled'],
-                        'refund' => ['from' => 'paid', 'to' => 'refunded'],
-                    ]
+                    'transitions' => [ 'place' => ['from'=>'draft','to'=>'placed'] ]
                 ]
             ]
         ]);

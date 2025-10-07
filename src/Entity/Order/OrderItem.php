@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace OrderComponent\Entity\Order;
 use Doctrine\ORM\Mapping as ORM;
 use OrderComponent\Entity\Order;
-use OrderComponent\ValueObject\Order\Quantity;
 use OrderComponent\ValueObject\Order\Sku;
+use OrderComponent\ValueObject\Order\Quantity;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'order_items')]
@@ -23,7 +23,7 @@ class OrderItem
     private string $sku;
 
     #[ORM\Column(type: 'integer')]
-    private int $unitPrice; // in minor units
+    private int $unitPrice;
 
     #[ORM\Column(type: 'integer')]
     private int $quantity;
@@ -38,19 +38,12 @@ class OrderItem
     private int $finalPrice = 0;
 
     public function __construct(Order $order, Sku $sku, Quantity $quantity, int $unitPrice)
-    {
-        $this->order = $order;
-        $this->sku = $sku->value;
-        $this->quantity = $quantity->value;
-        $this->unitPrice = $unitPrice;
-    }
+    { $this->order=$order; $this->sku=$sku->value; $this->quantity=$quantity->value; $this->unitPrice=$unitPrice; }
+
     public function getOrder(): Order { return $this->order; }
     public function getUnitPrice(): int { return $this->unitPrice; }
     public function getQuantity(): int { return $this->quantity; }
-    public function setCalculated(int $discount, int $tax, int $finalPrice): void
-    {
-        $this->discount = $discount; $this->tax = $tax; $this->finalPrice = $finalPrice;
-    }
+    public function setCalculated(int $discount, int $tax, int $final): void { $this->discount=$discount; $this->tax=$tax; $this->finalPrice=$final; }
     public function getDiscount(): int { return $this->discount; }
     public function getTax(): int { return $this->tax; }
     public function getFinalPrice(): int { return $this->finalPrice; }

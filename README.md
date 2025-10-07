@@ -1,7 +1,6 @@
-# OrderComponent — Iteration 6 (Pricing Engine)
+# OrderComponent — Iteration 7 (Workflow + Pricing Integration)
 
-- Money/Currency VOs
-- Order & OrderItem with minor units (cents)
-- Strategies: FlatPromotionStrategy (percent), FlatTaxationStrategy (rate)
-- PriceCalculator: recalc per-item and order totals
-- Tests: PriceCalculatorTest
+- Workflow (state_machine) transition `place`
+- PriceCalculator invoked on `place()` to compute order totals
+- Minor units (cents) storage
+- Integration test: Kernel + SQLite, SchemaTool, assert totals 7000/700/1260/7560

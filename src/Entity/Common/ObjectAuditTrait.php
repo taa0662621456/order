@@ -8,10 +8,7 @@ trait ObjectAuditTrait
     private \DateTimeImmutable $createdAt;
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
-    public function initAudit(): void
-    {
-        if (!isset($this->createdAt)) $this->createdAt = new \DateTimeImmutable('now');
-    }
+    public function initAudit(): void { if (!isset($this->createdAt)) $this->createdAt = new \DateTimeImmutable('now'); }
     public function touch(): void { $this->updatedAt = new \DateTimeImmutable('now'); }
     public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
     public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }

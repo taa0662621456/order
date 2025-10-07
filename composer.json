@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration6-pricing",
-  "description": "Order Component Iteration 6: Pricing & Taxation engine with strategies and calculator",
+  "name": "order/component-iteration7-workflow-pricing",
+  "description": "Order Component Iteration 7: Workflow + Pricing integration with SQLite integration test",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -8,6 +8,8 @@
     "symfony/framework-bundle": "^7.0",
     "symfony/dependency-injection": "^7.0",
     "symfony/config": "^7.0",
+    "symfony/console": "^7.0",
+    "symfony/workflow": "^7.0",
     "doctrine/orm": "^3.0",
     "doctrine/doctrine-bundle": "^2.12"
   },

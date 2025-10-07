@@ -4,6 +4,7 @@ namespace OrderComponent\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use OrderComponent\Entity\Common\ObjectAuditTrait;
 use OrderComponent\ValueObject\Money\Currency;
+use OrderComponent\ValueObject\Order\OrderStatus;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'orders')]
@@ -19,6 +20,9 @@ class Order
     #[ORM\Column(type: 'string', length: 3)]
     private string $currency = 'USD';
 
+    #[ORM\Column(type: 'string', length: 16)]
+    private string $status = OrderStatus::Draft->value;
+
     #[ORM\Column(type: 'integer')]
     private int $subtotal = 0;
 
@@ -33,17 +37,11 @@ class Order
 
     public function __construct(){ $this->initAudit(); }
     public function getId(): ?int { return $this->id; }
-
-    public function setCurrency(Currency $c): void { $this->currency = (string)$c; }
     public function getCurrency(): Currency { return new Currency($this->currency); }
-
-    public function setTotals(int $subtotal, int $discountTotal, int $taxTotal, int $grandTotal): void
-    {
-        $this->subtotal = $subtotal;
-        $this->discountTotal = $discountTotal;
-        $this->taxTotal = $taxTotal;
-        $this->grandTotal = $grandTotal;
-    }
+    public function setCurrency(Currency $c): void { $this->currency = (string)$c; }
+    public function getStatus(): OrderStatus { return OrderStatus::from($this->status); }
+    public function setStatus(OrderStatus $s): void { $this->status = $s->value; }
+    public function setTotals(int $subtotal, int $discount, int $tax, int $grand): void { $this->subtotal=$subtotal; $this->discountTotal=$discount; $this->taxTotal=$tax; $this->grandTotal=$grand; }
     public function getSubtotal(): int { return $this->subtotal; }
     public function getDiscountTotal(): int { return $this->discountTotal; }
     public function getTaxTotal(): int { return $this->taxTotal; }
