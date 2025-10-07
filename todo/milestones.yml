@@ -1,20 +1,77 @@
-# milestones.yml — Roadmap tracking
-milestones:
-  - title: v0.2.0-alpha
-    due: 2025-11-01
-    items:
-      - DOMAIN: Partial Payment/Refund/Shipment
-      - APP: Commands/Handlers partial*, Outbox v2 (retry/backoff)
-      - TESTS: E2E full cycle
-  - title: v0.3.0-beta
-    due: 2025-12-01
-    items:
-      - Pricing Engine, CQRS projections
-      - Inventory Saga
-      - Repositories→Specification, Migrations
-  - title: v1.0.0
-    due: 2026-01-15
-    items:
-      - Multi-currency
-      - Observability metrics pack
-      - Performance & Quality gates
+# GitHub Project Milestones — Order Ecosystem (α → β → γ)
+
+# Alpha Phase — Core Logic Stabilization
+- id: alpha-1
+  title: "α-1 Domain Layer stabilization"
+  description: "Finalize Order entities, value objects, Doctrine schema validation."
+  due_date: "2025-01-15"
+  status: "done"
+
+- id: alpha-2
+  title: "α-2 Application Layer (Transactional)"
+  description: "Implement OrderService, Domain Events, transactional boundaries."
+  due_date: "2025-01-30"
+  status: "done"
+
+- id: alpha-3
+  title: "α-3 Billing & Partial Payments"
+  description: "Partial payment/refund flow, OrderPaymentService, REST endpoints."
+  due_date: "2025-11-15"
+  status: "in-progress"
+
+# Beta Phase — Quality & Integration
+- id: beta-1
+  title: "β-1 Testing & QA"
+  description: "Increase unit/integration test coverage to ≥85%."
+  due_date: "2025-11-30"
+  status: "planned"
+
+- id: beta-2
+  title: "β-2 CI/CD & Packaging"
+  description: "Finalize GitHub Actions, Docker, Packagist publishing."
+  due_date: "2025-12-15"
+  status: "planned"
+
+- id: beta-3
+  title: "β-3 API Platform Finalization"
+  description: "CRUD + billing endpoints + OpenAPI docs."
+  due_date: "2025-12-30"
+  status: "planned"
+
+# Gamma Phase — Modularization
+- id: gamma-1
+  title: "γ-1 Split Payment domain"
+  description: "Extract PaymentComponent (entities, repos, services)."
+  due_date: "2026-01-30"
+  status: "planned"
+
+- id: gamma-2
+  title: "γ-2 Split Shipment domain"
+  description: "Extract ShipmentComponent for delivery operations."
+  due_date: "2026-02-15"
+  status: "planned"
+
+- id: gamma-3
+  title: "γ-3 Split Taxation domain"
+  description: "Extract TaxationComponent for taxes and rates."
+  due_date: "2026-03-01"
+  status: "planned"
+
+- id: gamma-4
+  title: "γ-4 Interface alignment"
+  description: "Define interfaces for Order ↔ Payment/Shipment/Taxation communication."
+  due_date: "2026-03-15"
+  status: "planned"
+
+- id: gamma-5
+  title: "γ-5 Modular testing & CI"
+  description: "Implement independent CI pipelines for each component."
+  due_date: "2026-04-01"
+  status: "planned"
+
+# Final Release
+- id: v1.0.0
+  title: "Order Ecosystem Stable Release"
+  description: "All components decoupled, production-grade stability achieved."
+  due_date: "2026-05-01"
+  status: "target"
