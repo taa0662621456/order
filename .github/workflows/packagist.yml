@@ -1,0 +1,33 @@
+name: Packagist Publish
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+jobs:
+  packagist_publish:
+    name: Publish to Packagist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Packagist
+        run: |
+          echo "🚀 Publishing to Packagist..."
+          curl -s -X POST             -H "Content-Type: application/json"             -d '{"repository":{"url":"https://github.com/${{ github.repository }}"}}'             https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USER }}&apiToken=${{ secrets.PACKAGIST_TOKEN }}
+          echo "✅ Packagist notified successfully."
+      - name: Slack Notify
+        if: always()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "*Packagist publish:* `${{ github.ref_name }}` → success",
+              "attachments": [
+                { "color": "good", "fields": [
+                    { "title": "Package", "value": "smartresponsor/ordercomponent", "short": false },
+                    { "title": "Version", "value": "${{ github.ref_name }}", "short": true }
+                ]}
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_PROD }}
