@@ -15,7 +15,27 @@ final class TestKernel extends Kernel
     }
     protected function configureContainer(ContainerConfigurator $c): void
     {
-        $c->extension('framework', ['secret' => 'test', 'test' => true]);
+        $c->import('%kernel.project_dir%/config/packages/messenger.php');
+        $c->import('%kernel.project_dir%/config/packages/test/messenger.php');
+        $c->extension('framework', [
+            'secret' => 'test', 'test' => true,
+            'workflows' => [
+                'order' => [
+                    'type' => 'state_machine',
+                    'supports' => ['OrderComponent\Entity\Order'],
+                    'initial_marking' => 'draft',
+                    'places' => ['draft','placed','paid','shipped','completed','cancelled','refunded'],
+                    'transitions' => [
+                        'place' => ['from' => 'draft', 'to' => 'placed'],
+                        'pay' => ['from' => 'placed', 'to' => 'paid'],
+                        'ship' => ['from' => 'paid', 'to' => 'shipped'],
+                        'complete' => ['from' => 'shipped', 'to' => 'completed'],
+                        'cancel' => ['from' => ['draft','placed'], 'to' => 'cancelled'],
+                        'refund' => ['from' => 'paid', 'to' => 'refunded'],
+                    ]
+                ]
+            ]
+        ]);
         $c->extension('doctrine', [
             'dbal' => ['url' => 'sqlite:///%kernel.cache_dir%/test.db'],
             'orm' => [

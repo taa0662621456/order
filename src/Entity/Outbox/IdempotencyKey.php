@@ -19,6 +19,5 @@ class IdempotencyKey
         $this->key = $key;
         $this->createdAt = new \DateTimeImmutable('now');
     }
-
     public function getKey(): string { return $this->key; }
 }

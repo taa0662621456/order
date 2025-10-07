@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration4-transactionalevents",
-  "description": "Order Component Iteration 4: Transaction middleware, Idempotency guard, Outbox v2, Replay command",
+  "name": "order/component-iteration5-messenger",
+  "description": "Order Component Iteration 5: Symfony Messenger integration (doctrine transport), idempotency middleware, workflow publishing",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -11,9 +11,10 @@
     "symfony/console": "^7.0",
     "symfony/workflow": "^7.0",
     "symfony/event-dispatcher": "^7.0",
+    "symfony/messenger": "^7.0",
+    "symfony/doctrine-messenger": "^7.0",
     "doctrine/orm": "^3.0",
     "doctrine/doctrine-bundle": "^2.12",
-    "psr/log": "^3.0",
     "ramsey/uuid": "^4.7"
   },
   "require-dev": {

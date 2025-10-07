@@ -2,45 +2,39 @@
 declare(strict_types=1);
 namespace OrderComponent\Service\Order;
 use Symfony\Component\Workflow\WorkflowInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order;
-use OrderComponent\ValueObject\Order\OrderStatus;
-use OrderComponent\Event\Order\{OrderPlacedEvent,OrderPaidEvent,OrderShippedEvent,OrderCancelledEvent,OrderRefundedEvent};
-use OrderComponent\Entity\Outbox\OutboxMessage;
+use OrderComponent\Message\OrderMessage;
 
 final class OrderWorkflowService
 {
     public function __construct(
         private readonly WorkflowInterface $workflow,
-        private readonly EventDispatcherInterface $dispatcher,
+        private readonly MessageBusInterface $bus,
         private readonly EntityManagerInterface $em
     ) {}
 
-    public function place(Order $order): void { $this->apply($order, 'place'); $this->dispatch(new OrderPlacedEvent($order)); }
-    public function pay(Order $order): void { $this->apply($order, 'pay'); $this->dispatch(new OrderPaidEvent($order)); }
-    public function ship(Order $order): void { $this->apply($order, 'ship'); $this->dispatch(new OrderShippedEvent($order)); }
-    public function cancel(Order $order): void { $this->apply($order, 'cancel'); $this->dispatch(new OrderCancelledEvent($order)); }
-    public function refund(Order $order): void { $this->apply($order, 'refund'); $this->dispatch(new OrderRefundedEvent($order)); }
+    public function place(Order $order): void { $this->apply($order, 'place'); $this->publish($order, 'OrderComponent\\Event\\Order\\OrderPlacedEvent'); }
+    public function pay(Order $order): void { $this->apply($order, 'pay'); $this->publish($order, 'OrderComponent\\Event\\Order\\OrderPaidEvent'); }
+    public function ship(Order $order): void { $this->apply($order, 'ship'); $this->publish($order, 'OrderComponent\\Event\\Order\\OrderShippedEvent'); }
+    public function cancel(Order $order): void { $this->apply($order, 'cancel'); $this->publish($order, 'OrderComponent\\Event\\Order\\OrderCancelledEvent'); }
+    public function refund(Order $order): void { $this->apply($order, 'refund'); $this->publish($order, 'OrderComponent\\Event\\Order\\OrderRefundedEvent'); }
 
     private function apply(Order $order, string $transition): void
     {
         if (!$this->workflow->can($order, $transition)) {
-            throw new \LogicException("Transition '$transition' not allowed from status {$order->getStatus()->value}");
+            throw new \LogicException("Transition '$transition' not allowed");
         }
         $this->workflow->apply($order, $transition);
         $this->em->persist($order);
         $this->em->flush();
     }
 
-    private function dispatch(object $event): void
+    private function publish(Order $order, string $eventName): void
     {
-        // Outbox write
-        $payload = json_encode(['orderId' => $event->order->getId(), 'event' => $event::class], JSON_THROW_ON_ERROR);
-        $this->em->persist(new OutboxMessage($event::class, (string)$payload));
-        $this->em->flush();
-
-        // In-process dispatch
-        $this->dispatcher->dispatch($event, $event::class);
+        $id = $order->getId();
+        if ($id === null) return;
+        $this->bus->dispatch(new OrderMessage($eventName, $id));
     }
 }
