@@ -1,22 +1,8 @@
 # Changelog
 
-## [v0.3.0-rc] - 2025-10-07
-### Added
-- Auto-release workflow (GitHub Actions) and CLI scripts (bash/ps1)
-- Dockerfile, docker-compose, Helm chart (minimal)
-- API Platform config (REST+GraphQL enabled)
-- CI matrix PHP 8.2/8.3 with caching and artifacts
-
-### Changed
-- Release process consolidated into single iteration
-
-### Fixed
-- n/a
-
-## [v0.2.0-beta] - 2025-10-07
-### Added
-- Beta scope & milestones, CI enhancements
-
-## [v0.1.0-alpha] - 2025-10-07
-### Added
-- Initial Order domain, Outbox, REST, tests
+## v0.4.0-beta (2025-10-06)
+- Webhooks: payment/refund с идемпотентностью (Idempotency-Key).
+- ReadModel: сервис пересчёта `OrderReadModelUpdater` + команда `order:readmodel:sync`.
+- Partial Payments & Refunds (v0.3.0) интегрированы в API и Messaging.
+- Observability: готовые /metrics, health/readiness.
+- Outbox: транзакционная доставка событий.

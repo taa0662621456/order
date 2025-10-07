@@ -1,0 +1,6 @@
+services:
+  OrderComponent\Repository\Order\IdempotencyKeyRepository: ~
+  OrderComponent\Service\Order\WebhookIdempotencyService:
+    arguments:
+      - '@OrderComponent\Repository\Order\IdempotencyKeyRepository'
+      - '@doctrine.orm.entity_manager'

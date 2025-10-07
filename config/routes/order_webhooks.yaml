@@ -1,0 +1,9 @@
+order_payment_webhook:
+  path: /webhooks/payment
+  controller: OrderComponent\Api\Order\Controller\PaymentWebhookController
+  methods: [POST]
+
+order_refund_webhook:
+  path: /webhooks/refund
+  controller: OrderComponent\Api\Order\Controller\RefundWebhookController
+  methods: [POST]
