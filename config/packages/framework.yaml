@@ -1,0 +1,5 @@
+framework:
+  secret: 'testsecret'
+  test: true
+  annotations: false
+  http_method_override: false
