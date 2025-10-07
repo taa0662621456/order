@@ -1,0 +1,41 @@
+name: Container Image Security Scan
+on:
+  schedule: [ { cron: "0 2 * * *" } ]
+  workflow_dispatch:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  trivy-image-scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image:
+          - ghcr.io/your-org/order-component:latest
+          - nginx:1.27-alpine
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy scan (table)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: 'image'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          format: 'table'
+          image-ref: ${{ matrix.image }}
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+      - name: Trivy scan (SARIF)
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: 'image'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          format: 'sarif'
+          output: 'trivy-image-${{ matrix.image##*/ }}.sarif'
+          image-ref: ${{ matrix.image }}
+          severity: 'CRITICAL,HIGH'
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-image-${{ matrix.image##*/ }}.sarif'

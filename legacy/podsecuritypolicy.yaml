@@ -1,0 +1,32 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: ordercomponent-restricted-psp
+annotations:
+  seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'runtime/default'
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsUser:
+    rule: MustRunAs
+    ranges:
+      - min: 1000
+        max: 1000
+  seLinux:
+    rule: RunAsAny
+  fsGroup:
+    rule: MustRunAs
+    ranges:
+      - min: 1000
+        max: 1000
+  supplementalGroups:
+    rule: MustRunAs
+    ranges:
+      - min: 1000
+        max: 1000
+  volumes:
+    - 'configMap'
+    - 'secret'
+    - 'emptyDir'
+    - 'projected'
