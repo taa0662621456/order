@@ -1,0 +1,106 @@
+name: Order Component CI/CD + Helm Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    name: Build & Test (PHP 8.2 / 8.3)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '8.2', '8.3' ]
+    services:
+      postgres:
+        image: postgres:15
+        ports: [5432:5432]
+        env:
+          POSTGRES_USER: symfony
+          POSTGRES_PASSWORD: symfony
+          POSTGRES_DB: order_test
+        options: >-
+          --health-cmd="pg_isready -U symfony -d order_test"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+          extensions: pdo_pgsql, intl, gd, mbstring
+          tools: composer:v2
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+      - name: Doctrine Migration
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+      - name: Run Tests
+        run: vendor/bin/phpunit --testdox --colors=always
+      - name: Static Analysis (PHPStan + Psalm)
+        run: |
+          vendor/bin/phpstan analyse --no-progress --level=max src
+          vendor/bin/psalm --output-format=compact
+      - name: Rector Dry-Run
+        run: vendor/bin/rector process src --dry-run
+
+  release:
+    name: Release & Publish
+    needs: build-test
+    if: github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag Release
+        run: |
+          VERSION=v$(date +'%Y.%m.%d')
+          git tag -a "$VERSION" -m "Automated release $VERSION"
+          git push origin "$VERSION"
+      - name: Publish to Packagist
+        env:
+          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+        run: composer publish
+      - name: Update GitHub Milestone
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const phase = 'α → β → γ';
+            core.notice(`Milestone phase progression: ${phase}`);
+
+  deploy-staging:
+    name: Deploy to Kubernetes (Staging)
+    needs: release
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/order:${{ github.sha }} .
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push image
+        run: docker push ghcr.io/${{ github.repository }}/order:${{ github.sha }}
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+      - name: Helm deploy to staging
+        run: |
+          helm upgrade --install order ./helm/order             --namespace order-staging             --create-namespace             --set image.repository=ghcr.io/${{ github.repository }}/order             --set image.tag=${{ github.sha }}             --wait
+      - name: Verify rollout
+        run: kubectl rollout status deployment/order -n order-staging
