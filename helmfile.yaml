@@ -1,21 +1,26 @@
+repositories:
+  - name: order
+    url: oci://ghcr.io/{{ env "GITHUB_REPOSITORY_OWNER" }}/helm-charts
+
 environments:
   staging:
-    values: [ charts/ordercomponent/values-staging.yaml ]
+    values:
+      - values/staging.yaml
   production:
-    values: [ charts/ordercomponent/values-production.yaml ]
+    values:
+      - values/production.yaml
 
 releases:
-  - name: ordercomponent-staging
+  - name: order-staging
     namespace: order-staging
-    chart: ./charts/ordercomponent
+    chart: order/ordercomponent
+    version: {{ env "ORDER_CHART_VERSION" | default "v1.0.0" }}
     values:
-      - charts/ordercomponent/values.yaml
-      - {{ .Environment.Values | toYaml | nindent 6 }}
+      - values/staging.yaml
 
-  - name: ordercomponent-prod
+  - name: order-prod
     namespace: order-prod
-    installed: {{ eq .Environment.Name "production" | toYaml }}
-    chart: ./charts/ordercomponent
+    chart: order/ordercomponent
+    version: {{ env "ORDER_CHART_VERSION" | default "v1.0.0" }}
     values:
-      - charts/ordercomponent/values.yaml
-      - charts/ordercomponent/values-production.yaml
+      - values/production.yaml
