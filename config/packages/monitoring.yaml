@@ -1,12 +1,11 @@
 services:
-  OrderComponent\Infrastructure\Monitoring\MetricsCollector:
-    arguments: ['@logger']
-    public: true
-
+  OrderComponent\Infrastructure\Monitoring\MetricsCollector: ~
+  OrderComponent\Infrastructure\Monitoring\MetricsController:
+    arguments: ['@OrderComponent\Infrastructure\Monitoring\MetricsCollector']
   OrderComponent\Infrastructure\Monitoring\TraceContextSubscriber:
-    arguments: ['@logger']
+    arguments: ['%env(default::string:OTEL_SERVICE_NAME)%', '%env(default::string:OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)%']
     tags: ['kernel.event_subscriber']
-
-  OrderComponent\Infrastructure\FaultTolerance\RateLimiterMiddleware:
-    arguments: [100]
-    tags: ['messenger.middleware']
+  OrderComponent\Infrastructure\Monitoring\HealthController:
+    arguments:
+      $db: '@doctrine.dbal.default_connection'
+      $orderTransport: '@?messenger.transport.order_async'

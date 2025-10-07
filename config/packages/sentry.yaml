@@ -3,3 +3,4 @@ sentry:
   options:
     environment: '%kernel.environment%'
     release: '%env(APP_VERSION)%'
+    traces_sample_rate: 1.0

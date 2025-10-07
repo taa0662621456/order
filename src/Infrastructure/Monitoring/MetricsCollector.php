@@ -3,20 +3,34 @@ declare(strict_types=1);
 
 namespace OrderComponent\Infrastructure\Monitoring;
 
-use Psr\Log\LoggerInterface;
+use Prometheus\CollectorRegistry;
+use Prometheus\Storage\InMemory;
+use Prometheus\RenderTextFormat;
 
 final class MetricsCollector
 {
-    public function __construct(private LoggerInterface $logger) {}
+    private CollectorRegistry $registry;
+
+    public function __construct(?CollectorRegistry $registry = null)
+    {
+        $this->registry = $registry ?? new CollectorRegistry(new InMemory());
+    }
 
     public function inc(string $name, array $labels = []): void
     {
-        // Placeholder: integrate symfony/metrics or Prometheus client here
-        $this->logger->info('[metric.inc]', ['name' => $name, 'labels' => $labels]);
+        $counter = $this->registry->getOrRegisterCounter('order', $name, '', array_keys($labels));
+        $counter->inc(array_values($labels));
     }
 
     public function observe(string $name, float $seconds, array $labels = []): void
     {
-        $this->logger->info('[metric.observe]', ['name' => $name, 'seconds' => $seconds, 'labels' => $labels]);
+        $hist = $this->registry->getOrRegisterHistogram('order', $name, '', array_keys($labels));
+        $hist->observe($seconds, array_values($labels));
+    }
+
+    public function render(): string
+    {
+        $renderer = new RenderTextFormat();
+        return $renderer->render($this->registry->getMetricFamilySamples());
     }
 }
