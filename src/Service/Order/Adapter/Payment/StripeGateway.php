@@ -9,7 +9,11 @@ final class StripeGateway implements PaymentGatewayInterface
 
     public function charge(string $orderId, string $amount, array $context = []): string
     {
-        // Заглушка. Реальная интеграция через stripe-php SDK.
         return 'stripe_' . substr(hash('sha256', $orderId.$amount.microtime()), 0, 18);
+    }
+
+    public function refund(string $orderId, string $amount, array $context = []): string
+    {
+        return 're_' . substr(hash('sha256', $orderId.$amount.microtime()), 0, 18);
     }
 }

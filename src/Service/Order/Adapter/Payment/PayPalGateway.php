@@ -11,4 +11,9 @@ final class PayPalGateway implements PaymentGatewayInterface
     {
         return 'paypal_' . substr(hash('sha256', $orderId.$amount.microtime()), 0, 18);
     }
+
+    public function refund(string $orderId, string $amount, array $context = []): string
+    {
+        return 're_' . substr(hash('sha256', $orderId.$amount.microtime()), 0, 18);
+    }
 }

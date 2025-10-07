@@ -1,0 +1,14 @@
+services:
+  OrderComponent\Repository\Order\OrderPaymentTransactionRepository: ~
+  OrderComponent\Repository\Order\OrderRefundTransactionRepository: ~
+
+  OrderComponent\Service\Order\PartialPaymentService:
+    arguments: ['@OrderComponent\Repository\Order\OrderPaymentTransactionRepository']
+
+  OrderComponent\Service\Order\RefundService:
+    arguments:
+      - '@OrderComponent\Service\Order\Adapter\Payment\PaymentGatewayInterface'
+      - '@OrderComponent\Repository\Order\OrderRefundTransactionRepository'
+
+  OrderComponent\MessageHandler\Order\OrderPartialPaymentCommandHandler: ~
+  OrderComponent\MessageHandler\Order\OrderRefundCommandHandler: ~
