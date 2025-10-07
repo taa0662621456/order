@@ -2,30 +2,26 @@
 declare(strict_types=1);
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
-use OrderComponent\Service\Order\OrderWorkflowService;
-use OrderComponent\Subscriber\Order\InventorySubscriber;
-use OrderComponent\Subscriber\Order\EmailSubscriber;
-use OrderComponent\Subscriber\Order\AnalyticsSubscriber;
+use OrderComponent\Service\Tx\TransactionMiddleware;
 use OrderComponent\Service\Outbox\OutboxProcessor;
-use OrderComponent\Command\WorkflowTestCommand;
+use OrderComponent\Service\Outbox\IdempotencyGuard;
+use OrderComponent\Command\OutboxReplayCommand;
 
 return static function (ContainerConfigurator $config): void {
-    $services = $config->services()->defaults()->autowire()->autoconfigure();
+    $s = $config->services()->defaults()->autowire()->autoconfigure();
 
-    $services->set(OrderWorkflowService::class)
-        ->arg(0, new Reference('workflow.order')) # WorkflowInterface
-        ->arg(1, new Reference('event_dispatcher'))
-        ->arg(2, new Reference('doctrine.orm.entity_manager'));
+    $s->set(TransactionMiddleware::class)
+        ->arg(0, new Reference('doctrine.orm.entity_manager'));
 
-    $services->set(InventorySubscriber::class)->tag('kernel.event_subscriber');
-    $services->set(EmailSubscriber::class)->tag('kernel.event_subscriber');
-    $services->set(AnalyticsSubscriber::class)->tag('kernel.event_subscriber');
+    $s->set(IdempotencyGuard::class)
+        ->arg(0, new Reference('doctrine.orm.entity_manager'));
 
-    $services->set(OutboxProcessor::class)
+    $s->set(OutboxProcessor::class)
         ->arg(0, new Reference('doctrine.orm.entity_manager'))
-        ->arg(1, new Reference('event_dispatcher'));
+        ->arg(1, new Reference(IdempotencyGuard::class))
+        ->arg(2, new Reference('logger', null));
 
-    $services->set(WorkflowTestCommand::class)
-        ->arg(0, new Reference(OrderWorkflowService::class))
+    $s->set(OutboxReplayCommand::class)
+        ->arg(0, new Reference(OutboxProcessor::class))
         ->tag('console.command');
 };

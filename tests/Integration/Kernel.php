@@ -4,7 +4,6 @@ namespace OrderComponent\Tests\Integration;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Component\Workflow\Workflow;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use OrderComponent\OrderComponentBundle;
 
@@ -16,25 +15,7 @@ final class TestKernel extends Kernel
     }
     protected function configureContainer(ContainerConfigurator $c): void
     {
-        $c->extension('framework', [
-            'secret' => 'test', 'test' => true,
-            'workflows' => [
-                'order' => [
-                    'type' => 'state_machine',
-                    'supports' => ['OrderComponent\Entity\Order'],
-                    'initial_marking' => 'draft',
-                    'places' => ['draft','placed','paid','shipped','completed','cancelled','refunded'],
-                    'transitions' => [
-                        'place' => ['from' => 'draft', 'to' => 'placed'],
-                        'pay' => ['from' => 'placed', 'to' => 'paid'],
-                        'ship' => ['from' => 'paid', 'to' => 'shipped'],
-                        'complete' => ['from' => 'shipped', 'to' => 'completed'],
-                        'cancel' => ['from' => ['draft','placed'], 'to' => 'cancelled'],
-                        'refund' => ['from' => 'paid', 'to' => 'refunded'],
-                    ]
-                ]
-            ]
-        ]);
+        $c->extension('framework', ['secret' => 'test', 'test' => true]);
         $c->extension('doctrine', [
             'dbal' => ['url' => 'sqlite:///%kernel.cache_dir%/test.db'],
             'orm' => [

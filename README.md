@@ -1,9 +1,7 @@
-# OrderComponent — Iteration 3 (Workflow & Events)
+# OrderComponent — Iteration 4 (Transactional & Idempotent Events)
 
-- Symfony Workflow state_machine `order`
-- Domain Events: OrderPlaced/OrderPaid/OrderShipped/OrderCancelled/OrderRefunded
-- Subscribers: Inventory, Email, Analytics
-- Outbox: OutboxMessage + IdempotencyKey (entity)
-- Service: OrderWorkflowService (applies transitions, writes Outbox, dispatches events)
-- CLI: `order:workflow:test`
-- Tests: `OrderWorkflowTest`
+- TransactionMiddleware: atomic run(callable), rollback on failure
+- IdempotencyGuard: prevents duplicate dispatches
+- OutboxProcessor v2: batch processing, retries, dead-letter
+- CLI: `outbox:replay [batch]`
+- Tests: Transaction rollback; Idempotency & Dead-letter

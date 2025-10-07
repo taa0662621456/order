@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration3-workflowevents",
-  "description": "Order Component Iteration 3: Workflow (state machine) + Domain Events + Outbox",
+  "name": "order/component-iteration4-transactionalevents",
+  "description": "Order Component Iteration 4: Transaction middleware, Idempotency guard, Outbox v2, Replay command",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -13,6 +13,7 @@
     "symfony/event-dispatcher": "^7.0",
     "doctrine/orm": "^3.0",
     "doctrine/doctrine-bundle": "^2.12",
+    "psr/log": "^3.0",
     "ramsey/uuid": "^4.7"
   },
   "require-dev": {
