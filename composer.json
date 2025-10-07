@@ -1,5 +1,5 @@
 {
-  "name": "smartresponsor/ordercomponent-tests",
+  "name": "smartresponsor/ordercomponent-tests-extended",
   "type": "project",
   "require": {
     "php": ">=8.2",
