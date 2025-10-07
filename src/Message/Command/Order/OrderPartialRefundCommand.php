@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace OrderComponent\Event\Order;
+namespace OrderComponent\Message\Command\Order;
 
-final readonly class OrderRefundedEvent
+readonly class OrderPartialRefundCommand
 {
     public function __construct(
         public string $orderId,

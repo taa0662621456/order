@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace OrderComponent\Event\Order;
+namespace OrderComponent\Message\Command\Order;
 
-final readonly class OrderPartiallyPaidEvent
+readonly class OrderPartialPayCommand
 {
     public function __construct(
         public string $orderId,
