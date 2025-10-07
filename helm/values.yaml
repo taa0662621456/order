@@ -1,0 +1,7 @@
+image:
+  repository: ghcr.io/youruser/ordercomponent
+  tag: 0.3.0-rc
+service:
+  type: ClusterIP
+  port: 8080
+env: {}

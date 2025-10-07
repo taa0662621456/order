@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    volumes: [ ".:/app" ]
+    command: php -v
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports: [ "5672:5672", "15672:15672" ]
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+      POSTGRES_DB: order
+    ports: [ "5432:5432" ]

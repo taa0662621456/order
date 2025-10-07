@@ -1,30 +1,22 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-## [v0.2.0-beta] - unreleased
+## [v0.3.0-rc] - 2025-10-07
 ### Added
-- API Platform layer (REST/GraphQL), custom operations (pay/refund/ship) via Messenger
-- Filters, serialization groups, OpenAPI docs
-- CI enhancements (matrix, cache, artifacts)
+- Auto-release workflow (GitHub Actions) and CLI scripts (bash/ps1)
+- Dockerfile, docker-compose, Helm chart (minimal)
+- API Platform config (REST+GraphQL enabled)
+- CI matrix PHP 8.2/8.3 with caching and artifacts
 
 ### Changed
-- Refined Outbox publishing and DomainEventPublisher
+- Release process consolidated into single iteration
 
 ### Fixed
-- Edge-cases around partial payments/refunds validation
-
-### Deprecated
 - n/a
 
-### Removed
-- n/a
+## [v0.2.0-beta] - 2025-10-07
+### Added
+- Beta scope & milestones, CI enhancements
 
 ## [v0.1.0-alpha] - 2025-10-07
 ### Added
-- Symfony 7 + Doctrine ORM 3 foundation
-- Domain entity `Order` (partial pay/refund/ship)
-- Domain events + Outbox + DomainEventPublisher
-- REST controller (create/pay/refund/ship/get)
-- Integration & Functional tests (in-memory Messenger)
-- Basic workflow config (state machine)
+- Initial Order domain, Outbox, REST, tests

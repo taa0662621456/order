@@ -1,0 +1,32 @@
+name: Auto Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_sqlite
+      - name: Install deps
+        run: composer install --no-interaction --prefer-dist
+      - name: Tests
+        run: vendor/bin/phpunit --testdox || true
+      - name: Build artifact
+        run: zip -r OrderComponent-${ github.ref_name }.zip . -x "vendor/*"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: OrderComponent-${ github.ref_name }.zip
+        env:
+          GITHUB_TOKEN: ${ secrets.GITHUB_TOKEN }
+      - name: Notify Packagist
+        if: secrets.PACKAGIST_TOKEN != ''
+        run: |
+          curl -X POST -H "Authorization: token ${ secrets.PACKAGIST_TOKEN }"                -d '{"repository": {"url":"https://github.com/YOURUSER/OrderComponent"}}'                https://packagist.org/api/update-package
