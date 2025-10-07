@@ -1,0 +1,12 @@
+services:
+  OrderComponent\Infrastructure\Monitoring\MetricsCollector:
+    arguments: ['@logger']
+    public: true
+
+  OrderComponent\Infrastructure\Monitoring\TraceContextSubscriber:
+    arguments: ['@logger']
+    tags: ['kernel.event_subscriber']
+
+  OrderComponent\Infrastructure\FaultTolerance\RateLimiterMiddleware:
+    arguments: [100]
+    tags: ['messenger.middleware']

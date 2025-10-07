@@ -1,0 +1,4 @@
+order_health:
+  path: /_health/order
+  controller: OrderComponent\Infrastructure\Monitoring\HealthCheckController
+  methods: [GET]
