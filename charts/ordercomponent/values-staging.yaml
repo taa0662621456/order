@@ -1,0 +1,21 @@
+rabbitmq:
+  enabled: true
+  auth:
+    username: user
+    password: changeme
+  persistence: { enabled: false }
+
+app:
+  hpa: { maxReplicas: 3 }
+  resources:
+    requests: { cpu: "100m", memory: "256Mi" }
+    limits:   { cpu: "400m", memory: "512Mi" }
+  ingress:
+    enabled: true
+    host: orders.staging.local
+
+worker:
+  hpa: { maxReplicas: 3 }
+  resources:
+    requests: { cpu: "150m", memory: "512Mi" }
+    limits:   { cpu: "500m", memory: "1Gi" }

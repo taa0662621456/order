@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: ordercomponent-worker }
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector: { matchLabels: { app: ordercomponent-worker } }
+  template:
+    metadata: { labels: { app: ordercomponent-worker } }
+    spec:
+      securityContext: {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: worker
+          image: {{ .Values.worker.image | quote }}
+          command: {{- toYaml .Values.worker.command | nindent 12 }}
+          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          livenessProbe:
+            exec: { command: {{ toYaml .Values.worker.probes.liveness.cmd | nindent 14 }} }
+            initialDelaySeconds: {{ .Values.worker.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.probes.liveness.periodSeconds }}
+          readinessProbe:
+            exec: { command: {{ toYaml .Values.worker.probes.readiness.cmd | nindent 14 }} }
+            initialDelaySeconds: {{ .Values.worker.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.probes.readiness.periodSeconds }}

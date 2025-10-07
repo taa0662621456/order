@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: ci-exporters }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: ci-exporters } }
+  template:
+    metadata: { labels: { app: ci-exporters } }
+    spec:
+      containers:
+        - name: ci-failure-exporter
+          image: {{ .Values.exporters.images.failure }}
+          ports: [{ containerPort: {{ .Values.exporters.ports.failure }} }]
+        - name: ci-metrics-exporter
+          image: {{ .Values.exporters.images.metrics }}
+          ports: [{ containerPort: {{ .Values.exporters.ports.metrics }} }]

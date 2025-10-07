@@ -1,0 +1,29 @@
+{{- if .Values.outboxCron.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata: { name: ordercomponent-outbox-replay }
+spec:
+  schedule: "{{ .Values.outboxCron.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: outbox
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              command: {{- toYaml .Values.outboxCron.command | nindent 16 }}
+              env:
+                {{- range $k, $v := .Values.env }}
+                - name: {{ $k }}
+                  value: "{{ $v }}"
+                {{- end }}
+                - name: JWT_SECRET_KEY
+                  value: "/app/config/jwt/private.pem"
+                - name: JWT_PUBLIC_KEY
+                  value: "/app/config/jwt/public.pem"
+              volumeMounts:
+                - { name: jwt, mountPath: /app/config/jwt, readOnly: true }
+          volumes:
+            - { name: jwt, secret: { secretName: ordercomponent-jwt } }
+{{- end }}

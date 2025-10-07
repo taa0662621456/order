@@ -1,0 +1,20 @@
+prometheus:
+  retention: 15d
+  replicas: 2
+  persistence:
+    enabled: true
+    size: 20Gi
+grafana:
+  adminUser: grafana
+  adminPassword: securepass
+  persistence:
+    enabled: true
+    size: 10Gi
+pushgateway:
+  replicas: 2
+ingress:
+  enabled: true
+  host: monitor.production.local
+  tls:
+    enabled: true
+    secretName: monitor-tls

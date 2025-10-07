@@ -1,0 +1,8 @@
+{{- if .Values.app.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: ordercomponent-app-pdb }
+spec:
+  minAvailable: {{ .Values.app.pdb.minAvailable }}
+  selector: { matchLabels: { app: ordercomponent-app } }
+{{- end }}

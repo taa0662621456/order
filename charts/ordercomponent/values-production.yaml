@@ -1,0 +1,26 @@
+rabbitmq:
+  enabled: true
+  auth:
+    username: user
+    password: ${RABBITMQ_PASSWORD}
+  persistence:
+    enabled: true
+    size: 8Gi
+
+app:
+  hpa: { maxReplicas: 10 }
+  resources:
+    requests: { cpu: "250m", memory: "512Mi" }
+    limits:   { cpu: "1",    memory: "1Gi" }
+  ingress:
+    enabled: true
+    host: orders.example.com
+    tls: { enabled: true, secretName: orders-tls }
+  pdb: { minAvailable: 1 }
+
+worker:
+  hpa: { maxReplicas: 10 }
+  resources:
+    requests: { cpu: "300m", memory: "768Mi" }
+    limits:   { cpu: "1",    memory: "1.5Gi" }
+  pdb: { minAvailable: 1 }

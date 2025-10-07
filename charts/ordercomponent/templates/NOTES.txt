@@ -1,0 +1,9 @@
+App:
+- Service: ordercomponent-svc ({{ .Values.service.type }}) port {{ .Values.service.port }}
+- Ingress: {{ if .Values.app.ingress.enabled }}http{{ if .Values.app.ingress.tls.enabled }}s{{ end }}://{{ .Values.app.ingress.host }}{{ else }}disabled{{ end }}
+
+RabbitMQ:
+- Enabled: {{ .Values.rabbitmq.enabled }} (svc: ordercomponent-rabbitmq)
+
+Outbox:
+- Cron schedule: {{ .Values.outboxCron.schedule }}

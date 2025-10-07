@@ -1,0 +1,29 @@
+prometheus:
+  image: prom/prometheus:v2.54.0
+  retention: 7d
+  scrapeInterval: 15s
+
+grafana:
+  image: grafana/grafana:10.2.0
+  adminUser: admin
+  adminPassword: admin
+  dashboards:
+    import: true
+
+pushgateway:
+  image: prom/pushgateway:v1.6.2
+  port: 9091
+
+exporters:
+  images:
+    failure: ordercomponent/ci-failure-exporter:latest
+    metrics: ordercomponent/ci-metrics-exporter:latest
+  ports:
+    failure: 9105
+    metrics: 9106
+
+ingress:
+  enabled: false
+  host: monitor.local
+  tls:
+    enabled: false
