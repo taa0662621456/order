@@ -1,0 +1,70 @@
+name: CI/CD - Auto Fix & Deploy
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *' # каждый день в 3 ночи
+  push:
+    branches: [ main ]
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: amqp, intl, pdo_pgsql
+          tools: composer:v2
+
+      - name: Install deps
+        run: composer install --no-interaction --no-progress
+
+      - name: Run Rector (auto-fix)
+        run: vendor/bin/rector process --ansi --no-diffs --config=rector.neon
+
+      - name: Run PHP-CS-Fixer (auto-fix)
+        run: vendor/bin/php-cs-fixer fix --allow-risky=yes --using-cache=no
+
+      - name: Commit & Push changes
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "OrderComponentBot"
+            git config user.email "ci@ordercomponent.dev"
+            git add -A
+            git commit -m "CI: auto-fix via Rector & PHP-CS-Fixer"
+            git push
+          fi
+
+  build-deploy:
+    needs: autofix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}:latest -f Dockerfile.prod .
+
+      - name: Push image
+        run: docker push ghcr.io/${{ github.repository }}:latest
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_DIR }}
+            docker pull ghcr.io/${{ github.repository }}:latest
+            docker compose -f docker/docker-compose.prod.yml up -d
+            docker exec $(docker ps -qf "name=php") php bin/console doctrine:migrations:migrate --no-interaction

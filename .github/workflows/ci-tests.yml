@@ -1,0 +1,44 @@
+name: CI - Tests & Analysis
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '8.2', '8.3' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: amqp, intl, pdo_pgsql
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Install deps
+        run: composer install --no-interaction --no-progress
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=1G --configuration=phpstan.neon
+
+      - name: Psalm
+        run: vendor/bin/psalm --show-info=false --output-format=compact
+
+      - name: Rector (dry-run)
+        run: vendor/bin/rector process --dry-run --config=rector.neon
+
+      - name: PHP-CS-Fixer (dry-run)
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit --testdox --colors=always
+
+      - name: Doctrine schema validation
+        run: php bin/console doctrine:schema:validate --skip-sync

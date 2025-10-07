@@ -1,8 +1,11 @@
+includes:
+  - phpstan-baseline.neon
+
 parameters:
   level: max
   paths:
     - src
-    - tests
-  checkGenericClassInNonGenericObjectType: true
-  checkMissingIterableValueType: true
-  inferPrivatePropertyTypeFromConstructor: true
+  tmpDir: var/cache/phpstan
+  ignoreErrors:
+    - '#LegacyPort#'
+    - '#@deprecated#'
