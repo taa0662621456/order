@@ -1,17 +1,21 @@
 {
-  "name": "smartresponsor/order-commandbus-outbox-tests",
+  "name": "smartresponsor/order-workflow-api-tests",
   "type": "project",
   "require": {
     "php": ">=8.2",
     "symfony/framework-bundle": "^7.0",
-    "symfony/messenger": "^7.0",
+    "symfony/workflow": "^7.0",
     "symfony/validator": "^7.0",
+    "symfony/messenger": "^7.0",
+    "symfony/console": "^7.0",
     "doctrine/orm": "^3.0",
-    "doctrine/doctrine-bundle": "^2.13",
-    "symfony/console": "^7.0"
+    "doctrine/doctrine-bundle": "^2.13"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5"
+    "phpunit/phpunit": "^10.5",
+    "symfony/browser-kit": "^7.0",
+    "symfony/dom-crawler": "^7.0",
+    "symfony/test-pack": "^1.0"
   },
   "autoload": {
     "psr-4": {

@@ -1,0 +1,14 @@
+framework:
+  workflows:
+    order:
+      type: 'state_machine'
+      supports: OrderComponent\\Entity\\Order\\Order
+      initial_marking: draft
+      places: [draft, placed, partially_paid, paid, partially_shipped, refunded, completed]
+      transitions:
+        place: { from: draft, to: placed }
+        pay_partial: { from: [placed, partially_paid], to: partially_paid }
+        pay_full: { from: [partially_paid, placed], to: paid }
+        ship_partial: { from: paid, to: partially_shipped }
+        complete: { from: partially_shipped, to: completed }
+        refund_partial: { from: [paid, partially_paid], to: refunded }
