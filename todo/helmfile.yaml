@@ -1,0 +1,21 @@
+repositories:
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+
+environments:
+  staging:
+    values:
+      - charts/observability/values-staging.yaml
+  production:
+    values:
+      - charts/observability/values-production.yaml
+
+releases:
+  - name: order-observability
+    namespace: monitoring
+    chart: ./charts/observability
+    values:
+      - charts/observability/values.yaml
+      - {{ .Environment.Values | toYaml | nindent 6 }}

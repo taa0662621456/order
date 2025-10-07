@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata: { name: ci-exporters }
+spec:
+  ports:
+    - port: 9105
+      targetPort: 9105
+    - port: 9106
+      targetPort: 9106
+  selector: { app: ci-exporters }

@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: observability-servicemonitor
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: ci-exporters
+  endpoints:
+    - port: 9105
+      interval: 15s
+    - port: 9106
+      interval: 15s
