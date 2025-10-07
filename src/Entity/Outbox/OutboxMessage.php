@@ -5,35 +5,58 @@ namespace OrderComponent\Entity\Outbox;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: 'OrderComponent\\Repository\\Outbox\\OutboxMessageRepository')]
-#[ORM\Table(name: 'outbox_message')]
+#[ORM\Entity]
+#[ORM\Table(name: 'outbox_messages')]
 class OutboxMessage
 {
-    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'bigint')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[ORM\Column(length: 64)]
+    private string $aggregateId;
+
     #[ORM\Column(length: 128)]
-    private string $topic;
+    private string $eventType;
 
-    #[ORM\Column(type: 'json')]
-    private array $payload;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $published = false;
+    #[ORM\Column(type: 'text')]
+    private string $payload;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
+    private \DateTimeImmutable $occurredAt;
 
-    public function __construct(string $topic, array $payload)
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $dispatched = false;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $dispatchedAt = null;
+
+    public function __construct(string $aggregateId, string $eventType, array $payload)
     {
-        $this->topic = $topic;
-        $this->payload = $payload;
-        $this->createdAt = new \DateTimeImmutable();
+        $this->aggregateId = $aggregateId;
+        $this->eventType = $eventType;
+        $this->payload = json_encode($payload, JSON_THROW_ON_ERROR);
+        $this->occurredAt = new \DateTimeImmutable();
     }
 
     public function id(): ?int { return $this->id; }
-    public function topic(): string { return $this->topic; }
-    public function payload(): array { return $this->payload; }
-    public function isPublished(): bool { return $this->published; }
-    public function markPublished(): void { $this->published = true; }
+    public function markDispatched(): void
+    {
+        $this->dispatched = true;
+        $this->dispatchedAt = new \DateTimeImmutable();
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'aggregateId' => $this->aggregateId,
+            'eventType' => $this->eventType,
+            'payload' => json_decode($this->payload, true, 512, JSON_THROW_ON_ERROR),
+            'occurredAt' => $this->occurredAt->format(DATE_ATOM),
+            'dispatched' => $this->dispatched,
+            'dispatchedAt' => $this->dispatchedAt?->format(DATE_ATOM),
+        ];
+    }
 }
