@@ -1,0 +1,73 @@
+{
+  "Domain": {
+    "priority": "P0",
+    "items": [
+      "Aggregate Roots: Order, OrderItem, OrderPayment, OrderShipment",
+      "VO: Money, Currency, Taxation, Discount, Quantity, Sku",
+      "Entities: OrderStorage/OrderInventory, OrderAddress, OrderVendor (→ VendorInterface)",
+      "Repositories: OrderRepository, OrderItemRepository, OrderPaymentRepository, OrderShipmentRepository",
+      "State machine: Draft→Placed→Paid→Shipped→Completed/Cancelled/Refunded"
+    ]
+  },
+  "App": {
+    "priority": "P0",
+    "items": [
+      "Commands & Handlers: OrderPlacing/Cancelation/Refunding/Shipment/Payment",
+      "Transactional boundary (App Service / Handler)",
+      "Outbox + IdempotencyKey (+ consumer)",
+      "Read models: OrderView, OrderCustomerOrdersView; syncReadModels command"
+    ]
+  },
+  "Infra": {
+    "priority": "P1",
+    "items": [
+      "Doctrine mapping (attributes/xml/yaml), indexes, FK, migrations",
+      "TransactionMiddleware, RateLimiterMiddleware",
+      "AuthN/AuthZ (Token Storage), Validation (Assert), Monolog processors",
+      "Integrations: Inventory (reserve/release), Payment (gateways, webhooks, refund), Shipment (carrier strategy, tracking)"
+    ]
+  },
+  "Pricing": {
+    "priority": "P1",
+    "items": [
+      "Engine: Base + Discounts + Taxes + Shipping + Fees",
+      "Strategies: PromotionStrategyInterface, TaxationStrategyInterface",
+      "Currency conversion & rounding policies"
+    ]
+  },
+  "BundleDI": {
+    "priority": "P1",
+    "items": [
+      "Extension + CompilerPass (autotags for handlers/subscribers)",
+      "Configuration Tree (order.yaml) with defaults",
+      "Auto-mapping Doctrine entities"
+    ]
+  },
+  "Tests": {
+    "priority": "P0",
+    "items": [
+      "Unit (VO/Service/Handler) ≥ 90%",
+      "Integration (Doctrine/Messenger/Outbox) ≥ 80%",
+      "Functional (API)",
+      "E2E: end-to-end lifecycle",
+      "Fixtures/Factories"
+    ]
+  },
+  "CI": {
+    "priority": "P0",
+    "items": [
+      "GitHub Actions matrix 8.2/8.3",
+      "composer validate; phpunit; phpstan; psalm; rector dry-run",
+      "Artifact build (OrderComponent-alpha.zip)",
+      "Tagging workflow"
+    ]
+  },
+  "Docs": {
+    "priority": "P2",
+    "items": [
+      "README с API-примерами",
+      "OpenAPI (если есть REST)",
+      "OrderSandboxApp (демо интеграция)"
+    ]
+  }
+}
