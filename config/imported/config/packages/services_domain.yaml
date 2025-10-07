@@ -1,0 +1,17 @@
+# --- API Platform DomainCheck (prod) ---
+parameters:
+  vendor.base_zone: '%env(VENDOR_BASE_ZONE)%'
+
+services:
+  App\Api\Provider\DomainCheckProvider:
+    arguments:
+      $domainCheckLimiter: '@limiter.domain_check'
+      $domainCheckGlobal: '@limiter.domain_check_global'
+      $baseZone: '%vendor.base_zone%'
+      $strategy: '%env(default:DOMAIN_CHECK_STRATEGY)%'
+      $suggestLimit: '%env(int:DOMAIN_SUGGEST_LIMIT)%'
+      $suggestMaxChecks: '%env(int:DOMAIN_SUGGEST_MAX_CHECKS)%'
+      $enabled: '%env(bool:DOMAIN_CHECK_ENABLED)%'
+  App\EventSubscriber\DomainEventSubscriber:
+    tags: [ 'doctrine.event_subscriber' ]
+# --- /API Platform DomainCheck (prod) ---
