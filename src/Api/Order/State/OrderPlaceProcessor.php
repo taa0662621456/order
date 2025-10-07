@@ -28,14 +28,12 @@ final class OrderPlaceProcessor implements ProcessorInterface
             'items' => array_map(fn($i) => ['sku' => $i->sku, 'qty' => $i->qty, 'price' => $i->price], $data->items),
             'placeAt' => $data->placeAt ?? (new \DateTimeImmutable())->format(DATE_ATOM),
         ];
-
         $this->bus->dispatch(new OrderPlaceCommand($payload));
-        $this->em->flush(); // единая транзакция с outbox, если используется
+        $this->em->flush();
 
-        // Возвращаем облегчённый ресурс
         $r = new OrderResource();
         $r->id = $orderId;
-        $r->number = $payload['orderId'];
+        $r->number = $orderId;
         $r->status = 'placed';
         $r->currency = $payload['currency'];
         $r->grandTotal = '0.00';

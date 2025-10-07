@@ -1,24 +1,21 @@
-# Iteration G — API Platform Integration (Order)
+# Iteration H — API & Business Finalization (One-shot)
 
-## Что даёт
-- REST и GraphQL слой для Order (read из ReadModel; write через команды).
-- Post / Patch / Delete маршрутизируются в Messenger-команды (place/cancel/pay/ship).
-- GraphQL: Query item/collection, Mutation place.
+## Что включено
+- API Platform (REST + GraphQL) для Order: ресурсы, провайдер, процессоры.
+- Payment & Shipment: интерфейсы, адаптеры (Stripe/PayPal, UPS/DHL), хендлеры команд.
+- Subscribers: PaymentWebhookListener, ShipmentStatusListener.
+- DI-конфиг: выбор конкретных адаптеров через алиасы.
+- E2E-тест: place → pay → ship.
 
 ## Подключение
-1) `composer require api-platform/core` (или api-platform/api-pack)
-2) Включить конфиг `config/packages/api_platform_order.yaml`
-3) Убедиться, что `OrderComponent\ReadModel\Entity\OrderView` доступен в ORM
+1) `composer require api-platform/api-pack` (если не установлен)
+2) Включить `config/packages/api_platform_order.yaml`
+3) Убедиться, что в проекте есть итерации A–F (ReadModel, Outbox, Observability и т.д.)
 
-## Эндпоинты
-- `GET /orders` — коллекция (из OrderView)
-- `GET /orders/{id}` — item (из OrderView)
-- `POST /orders` — place (OrderPlaceCommand)
-- `PATCH /orders/{id}` — cancel/pay/ship (в зависимости от полей)
-- `DELETE /orders/{id}` — cancel
-
-GraphQL:
-- `/graphql` — Query: item/collection, Mutation: place
+## Настройка провайдеров
+- Платёжный шлюз по умолчанию: Stripe (`PaymentGatewayInterface → StripeGateway`).
+- Перевозчик по умолчанию: UPS (`CarrierInterface → UPSCarrier`).
+Переопредели в env-специфичных `services_*.yaml` при необходимости.
 
 ## Тест
-`tests/Order/Functional/ApiPlatformOrderTest.php`
+`phpunit tests/Order/E2E/OrderApiFlowTest.php`

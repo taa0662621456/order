@@ -9,8 +9,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -33,7 +31,7 @@ use OrderComponent\Api\Order\State\OrderDeleteProcessor;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(processor: OrderPlaceProcessor::class, validationContext: ['groups' => ['Default']]),
+        new Post(processor: OrderPlaceProcessor::class),
         new Patch(processor: OrderPatchProcessor::class),
         new Delete(processor: OrderDeleteProcessor::class),
     ]
@@ -73,6 +71,11 @@ final class OrderResource
     public array $items = [];
 
     #[Groups(['order:write'])]
-    #[Assert\NotBlank]
-    public string $placeAt;
+    public ?string $payAmount = null;
+
+    #[Groups(['order:write'])]
+    public ?string $shipCarrier = null;
+
+    #[Groups(['order:write'])]
+    public ?string $placeAt = null;
 }

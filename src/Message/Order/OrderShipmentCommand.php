@@ -5,5 +5,5 @@ namespace OrderComponent\Message\Order;
 
 final class OrderShipmentCommand
 {
-    public function __construct(public string $orderId) {}
+    public function __construct(public string $orderId, public string $carrier) {}
 }
