@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
-
 namespace OrderComponent\Entity\OrderItem;
-
 use Doctrine\ORM\Mapping as ORM;
 use OrderComponent\Entity\Order;
 
