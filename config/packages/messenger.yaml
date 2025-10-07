@@ -3,4 +3,4 @@ framework:
     transports:
       async: 'in-memory://'
     routing:
-      'OrderComponent\Messenger\Message\OutboxDispatchedMessage': async
+      'OrderComponent\\Messenger\\Message\\OutboxDispatchedMessage': async

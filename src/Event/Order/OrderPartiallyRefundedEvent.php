@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace OrderComponent\Event\Order;
+namespace OrderComponent\\Event\\Order;
 
 final readonly class OrderPartiallyRefundedEvent
 {

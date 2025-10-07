@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\EntityManagerInterface;
-use Tests\Kernel;
+use Doctrine\\ORM\\Tools\\SchemaTool;
+use Doctrine\\ORM\\EntityManagerInterface;
+use Tests\\Kernel;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
