@@ -1,6 +1,7 @@
-# OrderComponent — Iteration 7 (Workflow + Pricing Integration)
+# OrderComponent — Iteration 8 (Inventory & Payment Integration)
 
-- Workflow (state_machine) transition `place`
-- PriceCalculator invoked on `place()` to compute order totals
-- Minor units (cents) storage
-- Integration test: Kernel + SQLite, SchemaTool, assert totals 7000/700/1260/7560
+- Реальный workflow переход `place` и `pay`
+- Inventory: интерфейс + InMemory реализация, резерв при `place()`
+- Payments: `PaymentGatewayInterface`, `StripeGateway`, `PaymentProcessorService`, сущность `OrderPayment`
+- `OrderWorkflowService`: `place()` → reserve; `pay(amount)` → charge + transition to `paid`
+- Интеграционный тест: Kernel + SQLite, проверка резерва и записи платежа

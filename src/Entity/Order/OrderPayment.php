@@ -17,12 +17,25 @@ class OrderPayment
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Order $order;
 
-    #[ORM\Column(type: 'integer')]
-    private int $amount = 1000;
+    #[ORM\Column(type: 'string', length: 32)]
+    private string $gateway;
 
-    public function getId(): ?int { return $this->id; }
-    public function getOrder(): Order { return $this->order; }
-    public function setOrder(Order $order): void { $this->order = $order; }
-    public function getAmount(): int { return $this->amount; }
-    public function setAmount(int $amount): void { $this->amount = $amount; }
+    #[ORM\Column(type: 'string', length: 16)]
+    private string $status = 'pending';
+
+    #[ORM\Column(type: 'integer')]
+    private int $amount;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct(Order $order, string $gateway, int $amount)
+    {
+        $this->order = $order;
+        $this->gateway = $gateway;
+        $this->amount = $amount;
+        $this->createdAt = new \DateTimeImmutable('now');
+    }
+    public function markPaid(): void { $this->status = 'paid'; }
+    public function getStatus(): string { return $this->status; }
 }

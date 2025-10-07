@@ -22,7 +22,10 @@ final class TestKernel extends Kernel
                     'supports' => ['OrderComponent\Entity\Order'],
                     'initial_marking' => 'draft',
                     'places' => ['draft','placed','paid','shipped','completed','cancelled','refunded'],
-                    'transitions' => [ 'place' => ['from'=>'draft','to'=>'placed'] ]
+                    'transitions' => [
+                        'place' => ['from'=>'draft','to'=>'placed'],
+                        'pay' => ['from'=>'placed','to'=>'paid']
+                    ]
                 ]
             ]
         ]);

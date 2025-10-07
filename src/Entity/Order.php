@@ -25,23 +25,20 @@ class Order
 
     #[ORM\Column(type: 'integer')]
     private int $subtotal = 0;
-
     #[ORM\Column(type: 'integer')]
     private int $discountTotal = 0;
-
     #[ORM\Column(type: 'integer')]
     private int $taxTotal = 0;
-
     #[ORM\Column(type: 'integer')]
     private int $grandTotal = 0;
 
     public function __construct(){ $this->initAudit(); }
     public function getId(): ?int { return $this->id; }
     public function getCurrency(): Currency { return new Currency($this->currency); }
-    public function setCurrency(Currency $c): void { $this->currency = (string)$c; }
+    public function setCurrency(Currency $c): void { $this->currency=(string)$c; }
     public function getStatus(): OrderStatus { return OrderStatus::from($this->status); }
-    public function setStatus(OrderStatus $s): void { $this->status = $s->value; }
-    public function setTotals(int $subtotal, int $discount, int $tax, int $grand): void { $this->subtotal=$subtotal; $this->discountTotal=$discount; $this->taxTotal=$tax; $this->grandTotal=$grand; }
+    public function setStatus(OrderStatus $s): void { $this->status=$s->value; }
+    public function setTotals(int $subtotal,int $discount,int $tax,int $grand): void { $this->subtotal=$subtotal;$this->discountTotal=$discount;$this->taxTotal=$tax;$this->grandTotal=$grand; }
     public function getSubtotal(): int { return $this->subtotal; }
     public function getDiscountTotal(): int { return $this->discountTotal; }
     public function getTaxTotal(): int { return $this->taxTotal; }

@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration7-workflow-pricing",
-  "description": "Order Component Iteration 7: Workflow + Pricing integration with SQLite integration test",
+  "name": "order/component-iteration8-inventory-payment",
+  "description": "Order Component Iteration 8: Inventory & Payment integration with real workflow transition 'pay' and OrderPayment entity",
   "type": "library",
   "license": "MIT",
   "require": {
