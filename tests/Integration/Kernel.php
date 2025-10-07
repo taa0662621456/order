@@ -2,13 +2,12 @@
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Migrations\DoctrineMigrationsBundle;
+use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
+use Zenstruck\Foundry\ZenstruckFoundryBundle;
 use OrderComponent\OrderComponentBundle;
 
 final class TestKernel extends Kernel
@@ -19,30 +18,32 @@ final class TestKernel extends Kernel
             new FrameworkBundle(),
             new DoctrineBundle(),
             new DoctrineMigrationsBundle(),
+            new DoctrineFixturesBundle(),
+            new ZenstruckFoundryBundle(),
             new OrderComponentBundle(),
         ];
     }
 
     protected function configureContainer(ContainerConfigurator $container): void
     {
-        $container->extension('framework', ['secret' => 'test', 'test' => true, 'http_method_override' => false]);
+        $container->extension('framework', ['secret' => 'test', 'test' => true]);
         $container->extension('doctrine', [
-            'dbal' => ['url' => 'sqlite:///%kernel.project_dir%/var/data.db'],
+            'dbal' => ['url' => 'sqlite:///%kernel.cache_dir%/test.db'],
             'orm' => [
                 'auto_mapping' => true,
-                'mappings' => [
-                    'OrderComponent' => [
-                        'is_bundle' => false,
-                        'type' => 'attribute',
-                        'dir' => '%kernel.project_dir%/src/Entity',
-                        'prefix' => 'OrderComponent\Entity',
-                    ]
-                ]
+                'mappings' => {
+                    'OrderComponent': {
+                        'is_bundle': False,
+                        'type': 'attribute',
+                        'dir': '%kernel.project_dir%/src/Entity',
+                        'prefix': 'OrderComponent\\Entity'
+                    }
+                }
             ]
         ]);
-        $container->extension('doctrine_migrations', [
-            'migrations_paths' => ['DoctrineMigrations' => '%kernel.project_dir%/migrations']
-        ]);
+        $container->extension('doctrine_migrations', {
+            'migrations_paths': {'DoctrineMigrations': '%kernel.project_dir%/migrations'}
+        });
     }
 
     public function getProjectDir(): string

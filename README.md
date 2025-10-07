@@ -1,7 +1,7 @@
-# OrderComponent — Iteration 1 (Integration pack)
+# OrderComponent — Iteration 1 (Fixtures & Foundry)
 
-- Doctrine migrations: `migrations/Version20251006_somecomment.php`
-- Console: `order:validate-mapping`
-- Integration tests with boot Kernel (SQLite file DB):
-  - `DoctrineMappingTest`
-  - `OrderLifecycleTest` (создание, переход статуса)
+Includes:
+- Doctrine Fixtures (`OrderFixtures`)
+- Foundry Factory (`OrderFactory`)
+- Integration Tests (SQLite in %kernel.cache_dir%/test.db)
+- bin/test.sh for full local run (install → migrate → phpunit)

@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration1-integration",
-  "description": "Order Component (Iteration 1) with migrations, mapping validation, and integration tests (Symfony 7 + Doctrine ORM 3.x)",
+  "name": "order/component-iteration1-fixtures",
+  "description": "Order Component Iteration 1 with fixtures, foundry, and integration tests",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -16,7 +16,9 @@
     "ramsey/uuid": "^4.7"
   },
   "require-dev": {
-    "symfony/test-pack": "^1.0"
+    "symfony/test-pack": "^1.0",
+    "doctrine/doctrine-fixtures-bundle": "^3.5",
+    "zenstruck/foundry": "^1.37"
   },
   "autoload": {
     "psr-4": {
