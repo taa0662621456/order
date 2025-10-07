@@ -1,20 +1,24 @@
-# Iteration F — Observability Polished
+# Iteration G — API Platform Integration (Order)
 
-## Composer
-composer require promphp/prometheus_client_php open-telemetry/sdk open-telemetry/exporter-otlp sentry/symfony
+## Что даёт
+- REST и GraphQL слой для Order (read из ReadModel; write через команды).
+- Post / Patch / Delete маршрутизируются в Messenger-команды (place/cancel/pay/ship).
+- GraphQL: Query item/collection, Mutation place.
 
-## Env
-SENTRY_DSN=...
-APP_VERSION=0.3.0-rc
-OTEL_SERVICE_NAME=order-component
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
+## Подключение
+1) `composer require api-platform/core` (или api-platform/api-pack)
+2) Включить конфиг `config/packages/api_platform_order.yaml`
+3) Убедиться, что `OrderComponent\ReadModel\Entity\OrderView` доступен в ORM
 
-## Endpoints
-- /metrics — Prometheus
-- /_health/order — liveness (DB)
-- /_ready/order — readiness (DB + Messenger)
+## Эндпоинты
+- `GET /orders` — коллекция (из OrderView)
+- `GET /orders/{id}` — item (из OrderView)
+- `POST /orders` — place (OrderPlaceCommand)
+- `PATCH /orders/{id}` — cancel/pay/ship (в зависимости от полей)
+- `DELETE /orders/{id}` — cancel
 
-## Wiring
-- config/packages/monitoring.yaml
-- config/packages/sentry.yaml
-- config/routes/monitoring.yaml
+GraphQL:
+- `/graphql` — Query: item/collection, Mutation: place
+
+## Тест
+`tests/Order/Functional/ApiPlatformOrderTest.php`
