@@ -1,0 +1,18 @@
+version: 2
+milestones:
+  - title: v0.2.0-beta Roadmap
+    description: Full API Platform + CI/CD Integration
+    columns:
+      - name: Backlog
+      - name: In Progress
+      - name: QA / Review
+      - name: Ready for Release
+
+  - title: v1.0.0 Stable
+    description: API Platform stable release + Analytics layer
+    columns:
+      - name: Planning
+      - name: Development
+      - name: Documentation
+      - name: Release Candidate
+      - name: Completed

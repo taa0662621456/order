@@ -1,28 +1,30 @@
 # Changelog
 
-## [1.0.0-rc1] - /home/sandbox
+All notable changes to this project will be documented in this file.
+
+## [v0.2.0-beta] - unreleased
 ### Added
-- Symfony 7 bundle with autowire/autoconfigure
-- Domain: Order, OrderItem, OrderPayment, OrderShipment; VOs Currency/Sku/Quantity
-- Workflow (state machine): draft → placed → paid → shipped → completed
-- Pricing engine (flat promo/tax strategies), Inventory/Payment/Shipment services
-- API Platform 3 resources and custom operations: `/orders`, `/orders/{id}/pay`, `/orders/{id}/ship`
-- Outbox pattern + Messenger (RabbitMQ-ready), handler + dispatcher
-- CI (GitHub Actions), Docker Compose (RabbitMQ), .env.example
-- Integration + functional tests (SQLite), in-memory transports for tests
+- API Platform layer (REST/GraphQL), custom operations (pay/refund/ship) via Messenger
+- Filters, serialization groups, OpenAPI docs
+- CI enhancements (matrix, cache, artifacts)
 
 ### Changed
-- Consolidated namespaces under `OrderComponent\*`
-- Messaging abstraction via `OrderEventMessage`
+- Refined Outbox publishing and DomainEventPublisher
 
-### Deprecated (from legacy import audit)
-- Implemented exact: 0
-- Partially implemented: 8
-- Needs port (left as LegacyPort stubs): 1885
+### Fixed
+- Edge-cases around partial payments/refunds validation
+
+### Deprecated
+- n/a
 
 ### Removed
-- Legacy ad-hoc classes superseded by bundle services
+- n/a
 
-### Security
-- None
-
+## [v0.1.0-alpha] - 2025-10-07
+### Added
+- Symfony 7 + Doctrine ORM 3 foundation
+- Domain entity `Order` (partial pay/refund/ship)
+- Domain events + Outbox + DomainEventPublisher
+- REST controller (create/pay/refund/ship/get)
+- Integration & Functional tests (in-memory Messenger)
+- Basic workflow config (state machine)
