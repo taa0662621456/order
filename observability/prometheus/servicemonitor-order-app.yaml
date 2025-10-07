@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: order-app
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: order-app
+  endpoints:
+    - port: http
+      interval: 15s
+      path: /metrics
+  namespaceSelector:
+    matchNames: ["order-staging","order-prod"]

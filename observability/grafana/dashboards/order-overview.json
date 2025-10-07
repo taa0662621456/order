@@ -1,0 +1,75 @@
+{
+  "title": "Order \u2014 Overview",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "HTTP 5xx Ratio",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\",app=~\"order-app|order-worker\"}[5m])) / clamp_min(sum(rate(http_requests_total{app=~\"order-app|order-worker\"}[5m])),1)",
+          "legendFormat": "5xx ratio"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "HPA Utilization (App/Worker)",
+      "targets": [
+        {
+          "expr": "(kube_hpa_status_current_replicas{hpa=\"order-app-hpa\"} / kube_hpa_spec_max_replicas{hpa=\"order-app-hpa\"})",
+          "legendFormat": "app HPA"
+        },
+        {
+          "expr": "(kube_hpa_status_current_replicas{hpa=\"order-worker-hpa\"} / kube_hpa_spec_max_replicas{hpa=\"order-worker-hpa\"})",
+          "legendFormat": "worker HPA"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU (per pod) \u2014 order-app",
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"order-app-.*\",container!=\"POD\"}[5m])) by (pod)",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory (per pod) \u2014 order-app",
+      "targets": [
+        {
+          "expr": "container_memory_working_set_bytes{pod=~\"order-app-.*\",container!=\"POD\"}",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      }
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}
