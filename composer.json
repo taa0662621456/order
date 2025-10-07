@@ -1,14 +1,58 @@
 {
-  "name": "order/component-iteration15-stabilization",
-  "description": "Order Component Iteration 15: Production Stabilization (migrations, readiness, requeue CLI, Prometheus rules, Grafana dashboard, rollback action, smoke/k6 tests)",
+  "name": "order/component",
+  "description": "Order Component for Symfony 7 + Doctrine ORM 3 \u2014 workflow, pricing, inventory, payment, shipment, outbox, RabbitMQ; API Platform 3.",
   "type": "library",
   "license": "MIT",
   "require": {
     "php": ">=8.2",
     "symfony/framework-bundle": "^7.0",
+    "symfony/dependency-injection": "^7.0",
+    "symfony/config": "^7.0",
     "symfony/console": "^7.0",
+    "symfony/event-dispatcher": "^7.0",
+    "symfony/workflow": "^7.0",
+    "symfony/http-foundation": "^7.0",
+    "symfony/http-kernel": "^7.0",
+    "symfony/routing": "^7.0",
+    "symfony/serializer-pack": "*",
+    "symfony/validator": "^7.0",
+    "symfony/messenger": "^7.0",
+    "symfony/amqp-messenger": "^7.0",
     "doctrine/orm": "^3.0",
     "doctrine/doctrine-bundle": "^2.12",
-    "doctrine/migrations": "^3.8"
+    "api-platform/core": "^3.2",
+    "nelmio/cors-bundle": "^2.4",
+    "psr/log": "^3.0"
+  },
+  "require-dev": {
+    "symfony/test-pack": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "OrderComponent\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OrderComponent\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "scripts": {
+    "test": "phpunit -v"
+  },
+  "keywords": [
+    "symfony",
+    "order",
+    "e-commerce",
+    "messenger",
+    "rabbitmq",
+    "api-platform",
+    "doctrine-orm"
+  ],
+  "support": {
+    "issues": "https://github.com/your-org/order-component/issues",
+    "source": "https://github.com/your-org/order-component"
   }
 }
