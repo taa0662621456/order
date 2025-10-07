@@ -27,10 +27,11 @@ final class Kernel extends BaseKernel
     {
         $confDir = __DIR__ . '/../config/packages';
         $loader->load(function (ContainerBuilder $container) use ($confDir) {
-            $loader = new YamlFileLoader($container, new FileLocator($confDir));
-            $loader->load('framework.yaml');
-            $loader->load('doctrine.yaml');
-            $loader->load('messenger.yaml');
+            $yaml = new YamlFileLoader($container, new FileLocator($confDir));
+            $yaml->load('framework.yaml');
+            $yaml->load('doctrine.yaml');
+            $yaml->load('messenger.yaml');
+            $container->setParameter('kernel.project_dir', dirname(__DIR__));
         });
     }
 }

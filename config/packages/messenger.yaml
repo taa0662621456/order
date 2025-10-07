@@ -1,6 +1,10 @@
 framework:
   messenger:
+    default_bus: messenger.bus.commands
+    buses:
+      messenger.bus.commands: ~
+      messenger.bus.events: ~
     transports:
       async: 'in-memory://'
     routing:
-      'OrderComponent\Messenger\Message\OutboxDispatchedMessage': async
+      'OrderComponent\\Messenger\\Message\\OutboxDispatchedMessage': async
