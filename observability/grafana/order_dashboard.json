@@ -1,0 +1,38 @@
+{
+  "title": "OrderComponent Dashboard",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Orders Placed (1h)",
+      "targets": [
+        {
+          "expr": "sum(increase(order_placed_total[1h]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Failed Queue Size",
+      "targets": [
+        {
+          "expr": "sum(failed_queue_messages_total)"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Order Grand Total",
+      "targets": [
+        {
+          "expr": "rate(order_total[5m])"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 1
+}

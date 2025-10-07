@@ -1,0 +1,18 @@
+groups:
+  - name: order_component.rules
+    rules:
+      - alert: HighFailedQueue
+        expr: sum by() (failed_queue_messages_total) > 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Failed queue has messages"
+          description: "There are messages in failed queue for > 5m."
+
+      - alert: NoOrdersPlaced
+        expr: rate(order_placed_total[15m]) == 0
+        for: 30m
+        labels: { severity: critical }
+        annotations:
+          summary: "No orders placed in 30m"
+          description: "Throughput dropped to zero."
