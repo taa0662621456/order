@@ -1,8 +1,6 @@
 framework:
   messenger:
-    failure_transport: failed
     transports:
-      async: '%env(MESSENGER_TRANSPORT_DSN)%'
-      failed: '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%'
+      async: 'in-memory://'
     routing:
-      'OrderComponent\Message\OrderEventMessage': async
+      'OrderComponent\Messenger\Message\OutboxDispatchedMessage': async
