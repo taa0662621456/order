@@ -9,18 +9,14 @@ use OrderComponent\Message\OrderEventMessage;
 final class OutboxMessengerDispatcher
 {
     public function __construct(private readonly EntityManagerInterface $em, private readonly MessageBusInterface $bus) {}
-
     public function dispatchPending(int $limit = 100): int
     {
-        $repo = $this->em->getRepository(OutboxMessage::class);
-        $messages = $repo->findBy(['status'=>'pending'], ['id'=>'ASC'], $limit);
-        $n = 0;
+        $messages = $this->em->getRepository(OutboxMessage::class)->findBy([], ['id'=>'ASC'], $limit);
+        $n=0;
         foreach ($messages as $m) {
             $payload = json_decode($m->getPayload(), true, 512, JSON_THROW_ON_ERROR);
-            $orderId = (int)($payload['orderId'] ?? 0);
-            $this->bus->dispatch(new OrderEventMessage($m->getEventName(), $orderId));
-            $m->markProcessed();
-            $n++;
+            $this->bus->dispatch(new OrderEventMessage($m->getEventName(), (int)($payload['orderId'] ?? 0)));
+            $this->em->remove($m); $n++;
         }
         $this->em->flush();
         return $n;

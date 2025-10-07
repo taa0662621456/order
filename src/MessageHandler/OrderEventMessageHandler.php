@@ -2,17 +2,17 @@
 declare(strict_types=1);
 namespace OrderComponent\MessageHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use OrderComponent\Message\OrderEventMessage;
 
 #[AsMessageHandler]
 final class OrderEventMessageHandler
 {
-    public function __construct(private readonly EventDispatcherInterface $dispatcher) {}
-    public function __invoke(\OrderComponent\Message\OrderEventMessage $m): void
+    public function __invoke(OrderEventMessage $m): void
     {
-        $eventClass = $m->eventName;
-        if (!class_exists($eventClass)) return;
-        $event = new $eventClass($m->orderId);
-        $this->dispatcher->dispatch($event, $eventClass);
+        // Simulate business failure for shipped events to trigger retries/DLQ
+        if ($m->eventName === 'OrderComponent\\Event\\Order\\OrderShippedEvent') {
+            throw new \RuntimeException('Simulated failure for shipped event');
+        }
+        // otherwise pretend success
     }
 }

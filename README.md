@@ -1,8 +1,9 @@
-# OrderComponent — Iteration 11 (RabbitMQ Async Outbox)
+# OrderComponent — Iteration 12 (RabbitMQ retry & DLQ)
 
-- Messenger + AMQP transport (RabbitMQ)
-- OutboxPublisher stores events with idempotencyKey
-- OutboxMessengerDispatcher sends `OrderEventMessage` to `async` transport
-- Handler reconstructs event and dispatches it to subscribers
-- Test Kernel uses `in-memory://` transport; prod via env `MESSENGER_TRANSPORT_DSN=amqp://guest:guest@rabbitmq:5672/%2f/messages`
-- Integration test verifies Workflow → Outbox → Queue flow
+- Messenger:
+  - retry strategy: max_retries=3, delay=100ms, multiplier=2
+  - failure_transport: `failed`
+  - AMQP options include DLX (`messages.dlx`) with routing key `order.events.failed`
+- Outbox: publisher + dispatcher to async transport
+- Handler: intentionally fails for `OrderShippedEvent` to exercise retries → DLQ
+- E2E test spins Worker with in-memory transports and asserts message ends in failed queue

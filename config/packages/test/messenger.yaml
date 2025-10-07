@@ -1,6 +1,8 @@
 framework:
   messenger:
+    failure_transport: failed
     transports:
       async: 'in-memory://'
+      failed: 'in-memory://'
     routing:
       'OrderComponent\Message\OrderEventMessage': async

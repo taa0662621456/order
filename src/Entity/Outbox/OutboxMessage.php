@@ -18,26 +18,15 @@ class OutboxMessage
     #[ORM\Column(type: 'text')]
     private string $payload;
 
-    #[ORM\Column(type: 'string', length: 16)]
-    private string $status = 'pending';
-
-    #[ORM\Column(type: 'smallint')]
-    private int $attempts = 0;
-
     #[ORM\Column(type: 'string', length: 64, unique: true)]
     private string $idempotencyKey;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
-
-    public function __construct(string $eventName, string $payload, string $key)
-    { $this->eventName=$eventName; $this->payload=$payload; $this->idempotencyKey=$key; $this->createdAt=new \DateTimeImmutable('now'); }
-
-    public function getId(): ?int { return $this->id; }
+    public function __construct(string $eventName, array $payload)
+    {
+        $this->eventName = $eventName;
+        $this->payload = json_encode($payload, JSON_THROW_ON_ERROR);
+        $this->idempotencyKey = sha1($eventName.':'.($payload['orderId'] ?? ''));
+    }
     public function getEventName(): string { return $this->eventName; }
     public function getPayload(): string { return $this->payload; }
-    public function getStatus(): string { return $this->status; }
-    public function markProcessed(): void { $this->status='processed'; }
-    public function markFailed(): void { $this->status='failed'; $this->attempts++; }
-    public function getIdempotencyKey(): string { return $this->idempotencyKey; }
 }

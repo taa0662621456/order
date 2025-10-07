@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true" bootstrap="vendor/autoload.php">
   <testsuites>
-    <testsuite name="OrderComponent Iteration11 RabbitMQ">
+    <testsuite name="OrderComponent Iteration12 RabbitMQ Retry & DLQ">
       <directory>tests</directory>
     </testsuite>
   </testsuites>

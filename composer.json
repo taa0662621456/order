@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration11-rabbitmq",
-  "description": "Order Component Iteration 11: Async Outbox via Symfony Messenger (RabbitMQ)",
+  "name": "order/component-iteration12-rabbitmq-retry-dlx",
+  "description": "Order Component Iteration 12: RabbitMQ retry strategy, DLQ, e2e worker test for failure transport",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -14,7 +14,8 @@
     "symfony/messenger": "^7.0",
     "symfony/amqp-messenger": "^7.0",
     "doctrine/orm": "^3.0",
-    "doctrine/doctrine-bundle": "^2.12"
+    "doctrine/doctrine-bundle": "^2.12",
+    "psr/log": "^3.0"
   },
   "require-dev": {
     "symfony/test-pack": "^1.0"

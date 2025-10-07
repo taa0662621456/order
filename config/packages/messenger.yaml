@@ -1,6 +1,30 @@
 framework:
   messenger:
+    failure_transport: failed
     transports:
-      async: '%env(MESSENGER_TRANSPORT_DSN)%'
+      async:
+        dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+        options:
+          exchange:
+            name: messages
+          queues:
+            messages:
+              binding_keys: ['order.events']
+              arguments:
+                x-dead-letter-exchange: 'messages.dlx'
+                x-dead-letter-routing-key: 'order.events.failed'
+        retry_strategy:
+          max_retries: 3
+          delay: 100
+          multiplier: 2
+          max_delay: 5000
+      failed:
+        dsn: '%env(MESSENGER_FAILURE_TRANSPORT_DSN)%'
+        options:
+          exchange:
+            name: messages.dlx
+          queues:
+            failed:
+              binding_keys: ['order.events.failed']
     routing:
       'OrderComponent\Message\OrderEventMessage': async
