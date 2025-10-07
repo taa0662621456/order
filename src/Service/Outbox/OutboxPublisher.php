@@ -1,11 +1,30 @@
 <?php
 declare(strict_types=1);
+
 namespace OrderComponent\Service\Outbox;
+
 use Doctrine\ORM\EntityManagerInterface;
-use OrderComponent\Entity\Outbox\OutboxMessage;
+use OrderComponent\Repository\Outbox\OutboxMessageRepository;
+use OrderComponent\Messenger\Message\OutboxDispatchedMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
+
 final class OutboxPublisher
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
-    public function publish(string $eventName, array $payload): void
-    { $key=sha1($eventName.':'.($payload['orderId']??'')); $repo=$this->em->getRepository(OutboxMessage::class); if($repo->findOneBy(['idempotencyKey'=>$key])) return; $this->em->persist(new OutboxMessage($eventName,$payload)); }
+    public function __construct(
+        private OutboxMessageRepository $repo,
+        private EntityManagerInterface $em,
+        private MessageBusInterface $bus
+    ) {}
+
+    public function replay(int $limit = 100): int
+    {
+        $count = 0;
+        foreach ($this->repo->findUnpublishedBatch($limit) as $msg) {
+            $this->bus->dispatch(new OutboxDispatchedMessage($msg->topic(), $msg->payload()));
+            $msg->markPublished();
+            $count++;
+        }
+        $this->em->flush();
+        return $count;
+    }
 }

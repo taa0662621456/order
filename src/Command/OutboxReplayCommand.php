@@ -1,19 +1,33 @@
 <?php
 declare(strict_types=1);
+
 namespace OrderComponent\Command;
+
+use OrderComponent\Service\Outbox\OutboxPublisher;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use OrderComponent\Service\Outbox\OutboxMessengerDispatcher;
 
-#[AsCommand(name: 'order:outbox:replay', description: 'Replay pending outbox messages')]
+#[AsCommand(name: 'order:outbox:replay', description: 'Publish outbox messages via Messenger transport')]
 final class OutboxReplayCommand extends Command
 {
-    public function __construct(private readonly OutboxMessengerDispatcher $disp) { parent::__construct(); }
-    protected function configure(): void { $this->addArgument('limit', InputArgument::OPTIONAL, 'Max messages', 500); }
+    public function __construct(private OutboxPublisher $publisher)
+    {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this->addArgument('limit', InputArgument::OPTIONAL, 'Max messages per run', '100');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
-    { $io=new SymfonyStyle($input,$output); $n=$this->disp->dispatchPending((int)$input->getArgument('limit')); $io->success("Dispatched $n messages from outbox"); return Command::SUCCESS; }
+    {
+        $limit = (int)$input->getArgument('limit');
+        $count = $this->publisher->replay($limit);
+        $output->writeln(sprintf('<info>Published %d message(s) from outbox</info>', $count));
+        return Command::SUCCESS;
+    }
 }
