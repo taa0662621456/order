@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true" bootstrap="vendor/autoload.php">
   <testsuites>
-    <testsuite name="OrderComponent Iteration4 TransactionalEvents">
+    <testsuite name="OrderComponent Iteration6 Pricing">
       <directory>tests</directory>
     </testsuite>
   </testsuites>

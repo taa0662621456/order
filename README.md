@@ -1,10 +1,7 @@
-# OrderComponent — Iteration 5 (Messenger Integration)
+# OrderComponent — Iteration 6 (Pricing Engine)
 
-- Doctrine transport: `doctrine://default?queue_name=order_outbox` (library config)
-- Test env uses `sync://` to run handlers immediately
-- IdempotencyMiddleware prevents duplicate OrderMessage handling
-- OrderWorkflowService publishes OrderMessage after transitions
-- MessageHandler converts OrderMessage to domain events via EventDispatcher
-
-Commands to run locally:
-  bin/console messenger:consume order_outbox
+- Money/Currency VOs
+- Order & OrderItem with minor units (cents)
+- Strategies: FlatPromotionStrategy (percent), FlatTaxationStrategy (rate)
+- PriceCalculator: recalc per-item and order totals
+- Tests: PriceCalculatorTest
