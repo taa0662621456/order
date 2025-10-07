@@ -1,0 +1,15 @@
+taxation:
+  default_currency: "USD"
+  rounding: 2
+  rates:
+    US:
+      default: 7.25
+      CA: 8.75
+      TX: 6.25
+    EU:
+      default: 20
+      DE: 19
+      FR: 20
+      NL: 21
+    UA:
+      default: 20
