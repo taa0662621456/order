@@ -1,7 +1,25 @@
 image:
-  repository: ghcr.io/youruser/ordercomponent
-  tag: 0.3.0-rc
+  repository: ghcr.io/acme/order
+  tagStable: "v1.0.0"
+  tagCanary: "v1.1.0"
+  pullPolicy: IfNotPresent
+
+replicaCount:
+  stable: 2
+  canary: 1
+
 service:
-  type: ClusterIP
-  port: 8080
-env: {}
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  host: order.smartresponsor.local
+  canaryWeight: 10
+  annotations: {}
+  tls:
+    enabled: false
+    secretName: ""
+
+resources: {}

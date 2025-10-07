@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "order-api-canary.fullname" . }}-canary
+spec:
+  replicas: {{ .Values.replicaCount.canary }}
+  selector:
+    matchLabels:
+      app: {{ include "order-api-canary.name" . }}
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: {{ include "order-api-canary.name" . }}
+        track: canary
+    spec:
+      containers:
+        - name: order
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tagCanary }}"
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: {{ .Values.service.targetPort }}
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: {{ .Values.service.targetPort }}
