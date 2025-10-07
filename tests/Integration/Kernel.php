@@ -14,6 +14,8 @@ final class TestKernel extends Kernel
 
     protected function configureContainer(ContainerConfigurator $c): void
     {
+        // Messenger test transport (in-memory)
+        $c->import('%kernel.project_dir%/config/packages/test/messenger.yaml');
         $c->extension('framework', [
             'secret' => 'test', 'test' => true,
             'workflows' => [

@@ -16,26 +16,9 @@ final class OrderWorkflowService
         private readonly OutboxPublisher $outbox
     ) {}
 
-    public function place(Order $order): void
-    {
-        $this->apply($order, 'place');
-        $this->outbox->publish(OrderPlacedEvent::class, ['orderId' => $order->getId()]);
-        $this->em->flush();
-    }
-
-    public function pay(Order $order): void
-    {
-        $this->apply($order, 'pay');
-        $this->outbox->publish(OrderPaidEvent::class, ['orderId' => $order->getId()]);
-        $this->em->flush();
-    }
-
-    public function ship(Order $order): void
-    {
-        $this->apply($order, 'ship');
-        $this->outbox->publish(OrderShippedEvent::class, ['orderId' => $order->getId()]);
-        $this->em->flush();
-    }
+    public function place(Order $order): void { $this->apply($order, 'place'); $this->outbox->publish(OrderPlacedEvent::class, ['orderId'=>$order->getId()]); $this->em->flush(); }
+    public function pay(Order $order): void { $this->apply($order, 'pay'); $this->outbox->publish(OrderPaidEvent::class, ['orderId'=>$order->getId()]); $this->em->flush(); }
+    public function ship(Order $order): void { $this->apply($order, 'ship'); $this->outbox->publish(OrderShippedEvent::class, ['orderId'=>$order->getId()]); $this->em->flush(); }
 
     private function apply(Order $order, string $transition): void
     {

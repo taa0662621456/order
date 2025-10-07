@@ -10,8 +10,10 @@ final class OutboxPublisher
     public function publish(string $eventName, array $payload): void
     {
         $json = json_encode($payload, JSON_THROW_ON_ERROR);
-        $m = new OutboxMessage($eventName, $json);
+        $key = sha1($eventName.':'.($payload['orderId'] ?? ''));
+        $exists = $this->em->getRepository(OutboxMessage::class)->findOneBy(['idempotencyKey'=>$key]);
+        if ($exists) return;
+        $m = new OutboxMessage($eventName, $json, $key);
         $this->em->persist($m);
-        // Do not flush here — rely on transaction boundary
     }
 }

@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration10-outbox-events",
-  "description": "Order Component Iteration 10: Outbox events + domain subscribers + processor command (SQLite tests)",
+  "name": "order/component-iteration11-rabbitmq",
+  "description": "Order Component Iteration 11: Async Outbox via Symfony Messenger (RabbitMQ)",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -11,6 +11,8 @@
     "symfony/console": "^7.0",
     "symfony/event-dispatcher": "^7.0",
     "symfony/workflow": "^7.0",
+    "symfony/messenger": "^7.0",
+    "symfony/amqp-messenger": "^7.0",
     "doctrine/orm": "^3.0",
     "doctrine/doctrine-bundle": "^2.12"
   },

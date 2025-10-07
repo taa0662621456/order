@@ -18,9 +18,6 @@ class AnalyticsRecord
     #[ORM\Column(type: 'integer')]
     private int $orderId;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
-
     public function __construct(string $type, int $orderId)
-    { $this->type=$type; $this->orderId=$orderId; $this->createdAt=new \DateTimeImmutable('now'); }
+    { $this->type=$type; $this->orderId=$orderId; }
 }

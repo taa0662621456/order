@@ -4,20 +4,11 @@ namespace OrderComponent\Subscriber\Order;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Analytics\AnalyticsRecord;
+use OrderComponent\Event\Order\OrderPaidEvent;
 
 final class AnalyticsSubscriber implements EventSubscriberInterface
 {
     public function __construct(private readonly EntityManagerInterface $em) {}
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            'OrderComponent\\Event\\Order\\OrderPaidEvent' => 'onPaid'
-        ];
-    }
-    public function onPaid(object $event): void
-    {
-        $orderId = (int)($event->orderId ?? 0);
-        $this->em->persist(new AnalyticsRecord('paid', $orderId));
-        $this->em->flush();
-    }
+    public static function getSubscribedEvents(): array { return [OrderPaidEvent::class => 'onPaid']; }
+    public function onPaid(OrderPaidEvent $e): void { $this->em->persist(new AnalyticsRecord('paid', $e->orderId)); $this->em->flush(); }
 }
