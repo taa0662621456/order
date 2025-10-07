@@ -4,26 +4,38 @@ namespace OrderComponent\Tests\Integration;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Component\Workflow\Workflow;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Zenstruck\Foundry\ZenstruckFoundryBundle;
 use OrderComponent\OrderComponentBundle;
 
 final class TestKernel extends Kernel
 {
     public function registerBundles(): iterable
     {
-        return [
-            new FrameworkBundle(),
-            new DoctrineBundle(),
-            new ZenstruckFoundryBundle(),
-            new OrderComponentBundle(),
-        ];
+        return [ new FrameworkBundle(), new DoctrineBundle(), new OrderComponentBundle() ];
     }
-
-    protected function configureContainer(ContainerConfigurator $container): void
+    protected function configureContainer(ContainerConfigurator $c): void
     {
-        $container->extension('framework', ['secret' => 'test', 'test' => true]);
-        $container->extension('doctrine', [
+        $c->extension('framework', [
+            'secret' => 'test', 'test' => true,
+            'workflows' => [
+                'order' => [
+                    'type' => 'state_machine',
+                    'supports' => ['OrderComponent\Entity\Order'],
+                    'initial_marking' => 'draft',
+                    'places' => ['draft','placed','paid','shipped','completed','cancelled','refunded'],
+                    'transitions' => [
+                        'place' => ['from' => 'draft', 'to' => 'placed'],
+                        'pay' => ['from' => 'placed', 'to' => 'paid'],
+                        'ship' => ['from' => 'paid', 'to' => 'shipped'],
+                        'complete' => ['from' => 'shipped', 'to' => 'completed'],
+                        'cancel' => ['from' => ['draft','placed'], 'to' => 'cancelled'],
+                        'refund' => ['from' => 'paid', 'to' => 'refunded'],
+                    ]
+                ]
+            ]
+        ]);
+        $c->extension('doctrine', [
             'dbal' => ['url' => 'sqlite:///%kernel.cache_dir%/test.db'],
             'orm' => [
                 'auto_mapping' => true,
@@ -34,13 +46,9 @@ final class TestKernel extends Kernel
                         'dir': '%kernel.project_dir%/src/Entity',
                         'prefix': 'OrderComponent\\Entity'
                     }
-                ]
+                }
             ]
         ]);
     }
-
-    public function getProjectDir(): string
-    {
-        return \dirname(__DIR__, 3);
-    }
+    public function getProjectDir(): string { return \dirname(__DIR__, 3); }
 }
