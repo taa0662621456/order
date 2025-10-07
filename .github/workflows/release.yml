@@ -1,32 +1,52 @@
-name: Auto Release
+name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag version (e.g., v0.4.0-beta)'
+        required: true
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, intl, pdo_sqlite
-      - name: Install deps
-        run: composer install --no-interaction --prefer-dist
-      - name: Tests
-        run: vendor/bin/phpunit --testdox || true
-      - name: Build artifact
-        run: zip -r OrderComponent-${ github.ref_name }.zip . -x "vendor/*"
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+          extensions: mbstring, intl, pdo_pgsql
+
+      - name: Cache Composer packages
+        uses: actions/cache@v3
         with:
-          files: OrderComponent-${ github.ref_name }.zip
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run tests
+        run: vendor/bin/phpunit --testdox --colors=always
+
+      - name: Archive OrderComponent
+        run: zip -r OrderComponent.zip src config README.md composer.json
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: OrderComponent.zip
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
+          name: "OrderComponent ${{ github.event.inputs.version || github.ref_name }}"
+          body_path: RELEASE_NOTES_${{ github.event.inputs.version || github.ref_name }}.md
         env:
-          GITHUB_TOKEN: ${ secrets.GITHUB_TOKEN }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Notify Packagist
-        if: secrets.PACKAGIST_TOKEN != ''
         run: |
-          curl -X POST -H "Authorization: token ${ secrets.PACKAGIST_TOKEN }"                -d '{"repository": {"url":"https://github.com/YOURUSER/OrderComponent"}}'                https://packagist.org/api/update-package
+          curl -XPOST -H 'content-type:application/json'           -d '{"repository":{"url":"https://github.com/your-org/OrderComponent"}}'           https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_TOKEN }}

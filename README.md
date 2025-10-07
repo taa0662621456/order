@@ -1,17 +1,41 @@
-# Iteration I — Partial Payment & Refunds
+# OrderComponent — Release Pipeline (Iteration K)
 
-## Что включено
-- Partial Payments: сущность `OrderPaymentTransaction`, сервис `PartialPaymentService`, команда/хендлер.
-- Refunds: сущность `OrderRefundTransaction`, сервис `RefundService`, команда/хендлер, API операция `/orders/{id}/refund`.
-- Платёжные шлюзы расширены методом `refund()`.
-- SQL: `migration_order_partial_payment_refund.sql`.
-- E2E тест: частичные оплаты и частичный возврат.
+## 🚀 CI/CD Auto-Release
+This iteration introduces **full release automation** for GitHub and Packagist.
 
-## Подключение
-1) Применить SQL миграции
-2) Подключить `config/services/order_payment_refund.yaml`
-3) Убедиться, что API Platform обрабатывает `POST /orders/{id}/refund` (операция добавлена процессором)
+### 🧩 Workflow summary
+- Trigger: `push tag v*.*.*` or manual dispatch with `version` input.
+- Steps:
+  1. Install dependencies and run tests.
+  2. Package source into `OrderComponent.zip`.
+  3. Create GitHub Release with notes and artifact.
+  4. Notify Packagist for update.
 
-## Пример запросов
-- Частичная оплата: `PATCH /orders/{id}` с `{ "payAmount": "10.00" }`
-- Возврат: `POST /orders/{id}/refund` с `{ "amount": "5.00", "reason": "customer_request" }`
+### 🔐 Required Secrets
+| Secret | Description |
+|---------|-------------|
+| `GITHUB_TOKEN` | Default GitHub Actions token (auto-provided) |
+| `PACKAGIST_USERNAME` | Your Packagist username |
+| `PACKAGIST_TOKEN` | API token from https://packagist.org/profile |
+
+### 🧰 Usage
+```bash
+git tag v0.4.0-beta
+git push origin v0.4.0-beta
+```
+or trigger manually via:
+```yaml
+workflow_dispatch:
+  inputs:
+    version: 'v0.4.0-beta'
+```
+
+### 🧠 Notes
+- Composer metadata reflects release version.
+- PHPStan, Psalm, Rector configured in composer scripts.
+- Coverage and logs saved as artifacts for CI audit.
+
+---
+
+**Version:** v0.4.0-beta  
+**Maintained by:** your-org / OrderComponent Team
