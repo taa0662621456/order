@@ -1,37 +1,42 @@
 <?php
 declare(strict_types=1);
+
 namespace OrderComponent\Entity\Order;
+
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use OrderComponent\Entity\Order;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'order_payments')]
+#[ORM\Table(name: 'order_payment')]
 class OrderPayment
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    #[Groups(['order:read'])]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Order::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'orderPayment')]
     private Order $order;
 
-    #[ORM\Column(type: 'string', length: 32)]
-    #[Groups(['order:read'])]
-    private string $gateway;
+    #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
+    private string $amount;
 
-    #[ORM\Column(type: 'string', length: 16)]
-    #[Groups(['order:read'])]
-    private string $status = 'pending';
+    #[ORM\Column(length: 3)]
+    private string $currency;
 
-    #[ORM\Column(type: 'integer')]
-    #[Groups(['order:read'])]
-    private int $amount;
+    #[ORM\Column(length: 64, unique: true)]
+    private string $externalRef;
 
-    public function __construct(Order $order, string $gateway, int $amount)
-    { $this->order=$order; $this->gateway=$gateway; $this->amount=$amount; }
-    public function markPaid(): void { $this->status='paid'; }
+    #[ORM\Column(type: 'boolean')]
+    private bool $isPartial = true;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $capturedAt;
+
+    public function __construct(Order $order, string $amount, string $currency, string $externalRef, bool $isPartial = true)
+    {
+        $this->order = $order;
+        $this->amount = $amount;
+        $this->currency = strtoupper($currency);
+        $this->externalRef = $externalRef;
+        $this->isPartial = $isPartial;
+        $this->capturedAt = new \DateTimeImmutable();
+    }
 }
