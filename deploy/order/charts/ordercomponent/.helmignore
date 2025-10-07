@@ -1,0 +1,11 @@
+.git/
+.github/
+.vscode/
+.idea/
+Dockerfile*
+docker-compose*
+README*.md
+tests/
+dist/
+.env*
+Makefile

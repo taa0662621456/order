@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: order-helmtest-e2e
+  labels:
+    app: order-helmtest-e2e
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  containers:
+    - name: e2e
+      image: {{ .Values.worker.image | quote }}
+      command:
+        - sh
+        - -ec
+        - |
+          echo "🚀 Running E2E order workflow..."
+          php bin/console order:test:e2e || {
+            echo "❌ E2E order test failed"
+            exit 1
+          }
+          echo "✅ E2E order workflow passed"
+  restartPolicy: Never

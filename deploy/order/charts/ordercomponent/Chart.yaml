@@ -1,0 +1,16 @@
+apiVersion: v2
+name: ordercomponent
+description: "Symfony 7 + Doctrine 3 Order Component with Outbox and Monitoring"
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - symfony
+  - doctrine
+  - ecommerce
+  - order
+  - outbox
+  - monitoring
+maintainers:
+  - name: Oleksandr Tishchenko
+    email: dev@smartresponsor.com
