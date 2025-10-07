@@ -1,0 +1,14 @@
+services:
+  OrderComponent\Messenger\Middleware\IdempotencyMiddleware:
+    arguments: ['@doctrine.orm.entity_manager']
+    tags: ['messenger.middleware']
+
+  OrderComponent\Service\Outbox\OutboxPublisher:
+    arguments:
+      - '@OrderComponent\Repository\Outbox\OutboxMessageRepository'
+      - '@doctrine.orm.entity_manager'
+      - '@messenger.bus.default'
+
+  OrderComponent\Command\OutboxReplayCommand:
+    arguments: ['@OrderComponent\Service\Outbox\OutboxPublisher']
+    tags: ['console.command']

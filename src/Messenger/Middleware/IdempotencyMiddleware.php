@@ -3,33 +3,30 @@ declare(strict_types=1);
 
 namespace OrderComponent\Messenger\Middleware;
 
+use Doctrine\ORM\EntityManagerInterface;
+use OrderComponent\Entity\Outbox\IdempotencyKey;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
-
-interface IdempotencyStoreInterface {
-    public function has(string $key): bool;
-    public function put(string $key): void;
-}
-
-final class InMemoryIdempotencyStore implements IdempotencyStoreInterface {
-    /** @var array<string,bool> */
-    private array $store = [];
-    public function has(string $key): bool { return isset($this->store[$key]); }
-    public function put(string $key): void { $this->store[$key] = true; }
-}
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 final class IdempotencyMiddleware implements MiddlewareInterface
 {
-    public function __construct(private IdempotencyStoreInterface $store) {}
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $key = $this->makeKey($envelope->getMessage());
-        if ($this->store->has($key)) {
-            return $envelope;
+        $message = $envelope->getMessage();
+        $key = $this->makeKey($message);
+
+        $found = $this->em->getRepository(IdempotencyKey::class)->find($key);
+        if ($found) {
+            return $envelope->with(new HandledStamp(null, static::class));
         }
-        $this->store->put($key);
+
+        $this->em->persist(new IdempotencyKey($key));
+        $this->em->flush();
+
         return $stack->next()->handle($envelope, $stack);
     }
 
