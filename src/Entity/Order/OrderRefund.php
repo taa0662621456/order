@@ -6,13 +6,13 @@ namespace OrderComponent\Entity\Order;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'order_payment')]
-class OrderPayment
+#[ORM\Table(name: 'order_refund')]
+class OrderRefund
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'orderPayment')]
+    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'orderRefund')]
     private Order $order;
 
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
@@ -21,22 +21,22 @@ class OrderPayment
     #[ORM\Column(length: 3)]
     private string $currency;
 
-    #[ORM\Column(length: 64, unique: true)]
-    private string $externalRef;
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $reason = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $isPartial = true;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $capturedAt;
+    private \DateTimeImmutable $refundedAt;
 
-    public function __construct(Order $order, string $amount, string $currency, string $externalRef, bool $isPartial = true)
+    public function __construct(Order $order, string $amount, string $currency, ?string $reason = null, bool $isPartial = true)
     {
         $this->order = $order;
         $this->amount = $amount;
         $this->currency = strtoupper($currency);
-        $this->externalRef = $externalRef;
+        $this->reason = $reason;
         $this->isPartial = $isPartial;
-        $this->capturedAt = new \DateTimeImmutable();
+        $this->refundedAt = new \DateTimeImmutable();
     }
 }

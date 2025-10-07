@@ -1,0 +1,10 @@
+services:
+  OrderComponent\Service\Outbox\OutboxWriter:
+    arguments: ['@doctrine.orm.entity_manager']
+
+  OrderComponent\EventSubscriber\DomainEventsToOutboxSubscriber:
+    arguments: ['@OrderComponent\Service\Outbox\OutboxWriter']
+    tags: ['doctrine.event_subscriber']
+
+  OrderComponent\EventSubscriber\OrderWorkflowGuardSubscriber:
+    tags: ['kernel.event_subscriber']
