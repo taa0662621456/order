@@ -1,0 +1,8 @@
+services:
+  OrderComponent\ReadModel\Repository\OrderReadRepository:
+    arguments: ['@doctrine.orm.entity_manager']
+  OrderComponent\ReadModel\Service\OrderReadModelProjector:
+    arguments: ['@doctrine.orm.entity_manager', '@OrderComponent\ReadModel\Repository\OrderReadRepository']
+  OrderComponent\ReadModel\Subscriber\*:
+    resource: '../src/ReadModel/Subscriber'
+    tags: ['kernel.event_subscriber']

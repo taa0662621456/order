@@ -1,0 +1,4 @@
+api_customer_orders_view:
+  path: /customers/{id}/orders/view
+  controller: OrderComponent\ReadModel\Api\Controller\CustomerOrdersViewAction
+  methods: [GET]
