@@ -31,14 +31,7 @@ class OrderShipment
     #[Groups(['order:read'])]
     private string $status = 'preparing';
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    #[Groups(['order:read'])]
-    private \DateTimeImmutable $createdAt;
-
-    public function __construct(Order $order, string $carrier, ?string $tracking = null)
-    {
-        $this->order = $order; $this->carrier = $carrier; $this->trackingNumber = $tracking;
-        $this->createdAt = new \DateTimeImmutable('now');
-    }
+    public function __construct(Order $order, string $carrier, ?string $tracking=null)
+    { $this->order=$order; $this->carrier=$carrier; $this->trackingNumber=$tracking; }
     public function markShipped(string $tracking): void { $this->status='shipped'; $this->trackingNumber=$tracking; }
 }

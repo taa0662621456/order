@@ -23,9 +23,9 @@ class OutboxMessage
 
     public function __construct(string $eventName, array $payload)
     {
-        $this->eventName = $eventName;
-        $this->payload = json_encode($payload, JSON_THROW_ON_ERROR);
-        $this->idempotencyKey = sha1($eventName.':'.($payload['orderId'] ?? ''));
+        $this->eventName=$eventName;
+        $this->payload=json_encode($payload, JSON_THROW_ON_ERROR);
+        $this->idempotencyKey=sha1($eventName.':'.($payload['orderId'] ?? ''));
     }
     public function getEventName(): string { return $this->eventName; }
     public function getPayload(): string { return $this->payload; }

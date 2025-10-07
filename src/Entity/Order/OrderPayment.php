@@ -31,14 +31,7 @@ class OrderPayment
     #[Groups(['order:read'])]
     private int $amount;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    #[Groups(['order:read'])]
-    private \DateTimeImmutable $createdAt;
-
     public function __construct(Order $order, string $gateway, int $amount)
-    {
-        $this->order = $order; $this->gateway = $gateway; $this->amount = $amount;
-        $this->createdAt = new \DateTimeImmutable('now');
-    }
+    { $this->order=$order; $this->gateway=$gateway; $this->amount=$amount; }
     public function markPaid(): void { $this->status='paid'; }
 }

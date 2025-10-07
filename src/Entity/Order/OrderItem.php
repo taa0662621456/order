@@ -36,18 +36,15 @@ class OrderItem
     #[ORM\Column(type: 'integer')]
     #[Groups(['order:read'])]
     private int $discount = 0;
-
     #[ORM\Column(type: 'integer')]
     #[Groups(['order:read'])]
     private int $tax = 0;
-
     #[ORM\Column(type: 'integer')]
     #[Groups(['order:read'])]
     private int $finalPrice = 0;
 
     public function __construct(Order $order, Sku $sku, Quantity $quantity, int $unitPrice)
     { $this->order=$order; $this->sku=$sku->value; $this->quantity=$quantity->value; $this->unitPrice=$unitPrice; }
-
     public function getOrder(): Order { return $this->order; }
     public function getUnitPrice(): int { return $this->unitPrice; }
     public function getQuantity(): int { return $this->quantity; }
