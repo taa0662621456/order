@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration1-fixtures",
-  "description": "Order Component Iteration 1 with fixtures, foundry, and integration tests",
+  "name": "order/component-iteration1-generator",
+  "description": "Order Component Iteration 1 with Foundry generator CLI and integration tests",
   "type": "library",
   "license": "MIT",
   "require": {

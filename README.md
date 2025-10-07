@@ -1,7 +1,6 @@
-# OrderComponent — Iteration 1 (Fixtures & Foundry)
+# OrderComponent — Iteration 1 (Generator)
 
-Includes:
-- Doctrine Fixtures (`OrderFixtures`)
-- Foundry Factory (`OrderFactory`)
-- Integration Tests (SQLite in %kernel.cache_dir%/test.db)
-- bin/test.sh for full local run (install → migrate → phpunit)
+Command:
+  php bin/console order:generate [count]
+
+Creates N orders via Foundry and prints bilingual success message.

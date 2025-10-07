@@ -41,9 +41,6 @@ final class TestKernel extends Kernel
                 }
             ]
         ]);
-        $container->extension('doctrine_migrations', {
-            'migrations_paths': {'DoctrineMigrations': '%kernel.project_dir%/migrations'}
-        });
     }
 
     public function getProjectDir(): string
