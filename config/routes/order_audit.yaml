@@ -1,0 +1,4 @@
+order_audit_log:
+  path: /orders/{id}/audit
+  controller: OrderComponent\Api\Order\OrderAuditAction
+  methods: [GET]

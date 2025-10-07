@@ -1,0 +1,17 @@
+services:
+  OrderComponent\Repository\Order\OutboxRepository:
+    arguments: ['@doctrine.orm.entity_manager']
+
+  OrderComponent\Service\Order\TransactionalEventPublisher:
+    arguments: ['@OrderComponent\Repository\Order\OutboxRepository', '@messenger.bus.default']
+
+  OrderComponent\Service\Order\OutboxRelay:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@OrderComponent\Repository\Order\OutboxRepository'
+      - '@OrderComponent\Service\Order\TransactionalEventPublisher'
+      - '@logger'
+
+  OrderComponent\MessageHandler\Order\OrderDomainMessageHandler:
+    arguments: ['@logger']
+    tags: ['messenger.message_handler']

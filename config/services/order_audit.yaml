@@ -1,0 +1,10 @@
+services:
+  OrderComponent\Repository\Order\OrderEventRepository:
+    arguments: ['@doctrine.orm.entity_manager']
+
+  OrderComponent\Service\Order\OrderAuditTrailBuilder:
+    arguments: ['@OrderComponent\Repository\Order\OrderEventRepository']
+
+  OrderComponent\Subscriber\Order\OrderAuditSubscriber:
+    arguments: ['@doctrine.orm.entity_manager', '@OrderComponent\Repository\Order\OrderEventRepository']
+    tags: ['kernel.event_subscriber']

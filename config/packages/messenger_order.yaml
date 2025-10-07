@@ -1,0 +1,16 @@
+framework:
+  messenger:
+    transports:
+      order_async: '%env(MESSENGER_TRANSPORT_DSN)%'
+      order_failed: 'doctrine://default?queue_name=order_failed' # fallback DLQ (optional)
+    routing:
+      'OrderComponent\Message\Order\OrderDomainMessage': order_async
+    failure_transport: order_failed
+    reset_on_message: true
+    # retry via transport (RabbitMQ has its own; fallback here)
+    buses:
+      messenger.bus.default:
+        default_middleware: allow_no_handlers
+        middleware:
+          - doctrine_transaction
+          - validation
