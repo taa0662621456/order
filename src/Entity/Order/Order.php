@@ -5,6 +5,7 @@ namespace OrderComponent\Entity\Order;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use DomainException;
 use OrderComponent\Event\Order\OrderPartiallyPaidEvent;
 use OrderComponent\Event\Order\OrderPartiallyRefundedEvent;
 use OrderComponent\Event\Order\OrderRefundedEvent;
@@ -50,6 +51,12 @@ class Order
 
     public function applyPartialPayment(string $amount, string $ref, bool $isPartial = true): void
     {
+        if (bccomp($amount, '0.00', 2) <= 0) {
+            throw new DomainException('Payment amount must be > 0');
+        }
+        if (bccomp(bcadd($this->paidTotal, $amount, 2), $this->grandTotal, 2) > 0) {
+            throw new DomainException('Payment exceeds order grand total');
+        }
         if ($this->status === 'draft') {
             $this->status = 'placed';
         }
@@ -60,6 +67,17 @@ class Order
 
     public function refundPartial(string $amount, ?string $reason = null): void
     {
+        if (bccomp($amount, '0.00', 2) <= 0) {
+            throw new DomainException('Refund amount must be > 0');
+        }
+        if (bccomp($this->paidTotal, '0.00', 2) <= 0) {
+            throw new DomainException('Cannot refund unpaid order');
+        }
+        $available = bcsub($this->paidTotal, $this->refundedTotal, 2);
+        if (bccomp($amount, $available, 2) > 0) {
+            throw new DomainException('Refund exceeds paid amount');
+        }
+
         $this->refundedTotal = bcadd($this->refundedTotal, $amount, 2);
         $this->record(new OrderPartiallyRefundedEvent($this->id, $amount, $this->currency, $reason));
         if (bccomp($this->refundedTotal, $this->paidTotal, 2) >= 0) {
@@ -72,10 +90,14 @@ class Order
 
     public function shipItems(int $count, ?string $note = null): void
     {
-        if ($this->status === 'paid') {
-            $this->status = 'partially_shipped';
+        if ($count <= 0) {
+            throw new DomainException('Shipment count must be > 0');
+        }
+        if (!in_array($this->status, ['paid', 'partially_shipped'], true)) {
+            throw new DomainException('Cannot ship before order is fully paid');
         }
         $this->record(new OrderPartiallyShippedEvent($this->id, $count, $note));
+        $this->status = 'partially_shipped';
     }
 
     /** @return array<int,object> */
