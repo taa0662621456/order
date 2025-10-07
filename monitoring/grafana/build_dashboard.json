@@ -1,0 +1,34 @@
+{
+  "title": "Build & Tests",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Coverage %",
+      "targets": [
+        {
+          "expr": "ci_coverage_percent"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Build Duration",
+      "targets": [
+        {
+          "expr": "ci_build_duration_seconds"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Failures (tests)",
+      "targets": [
+        {
+          "expr": "ci_failures_total{type=\"tests\"}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 37,
+  "version": 1
+}

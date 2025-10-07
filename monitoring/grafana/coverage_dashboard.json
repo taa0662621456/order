@@ -1,0 +1,16 @@
+{
+  "title": "Coverage Trend",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Coverage %",
+      "targets": [
+        {
+          "expr": "ci_coverage_percent"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 37,
+  "version": 1
+}

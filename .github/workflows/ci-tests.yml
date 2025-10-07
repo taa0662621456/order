@@ -1,4 +1,4 @@
-name: CI - Tests & Analysis
+name: CI - Tests & Analysis (with Alerts)
 on:
   push:
     branches: [ main, develop ]
@@ -8,37 +8,31 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        php: [ '8.2', '8.3' ]
-
+      matrix: { php: ['8.2','8.3'] }
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: amqp, intl, pdo_pgsql
-          coverage: xdebug
-          tools: composer:v2
-
+        with: { php-version: ${{ matrix.php }}, extensions: amqp, intl, pdo_pgsql, tools: composer:v2 }
       - name: Install deps
         run: composer install --no-interaction --no-progress
-
-      - name: PHPStan
-        run: vendor/bin/phpstan analyse --memory-limit=1G --configuration=phpstan.neon
-
-      - name: Psalm
-        run: vendor/bin/psalm --show-info=false --output-format=compact
-
-      - name: Rector (dry-run)
-        run: vendor/bin/rector process --dry-run --config=rector.neon
-
-      - name: PHP-CS-Fixer (dry-run)
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff
-
-      - name: PHPUnit
-        run: vendor/bin/phpunit --testdox --colors=always
-
-      - name: Doctrine schema validation
-        run: php bin/console doctrine:schema:validate --skip-sync
+      - name: Run tests & analysis
+        run: |
+          set -o pipefail
+          {
+            vendor/bin/phpstan analyse --memory-limit=1G --configuration=phpstan.neon
+            vendor/bin/psalm --show-info=false --output-format=compact
+            vendor/bin/rector process --dry-run --config=rector.neon
+            vendor/bin/php-cs-fixer fix --dry-run --diff
+            vendor/bin/phpunit --testdox --colors=always
+            php bin/console doctrine:schema:validate --skip-sync
+          } | tee "$GITHUB_WORKSPACE/job.log"
+      - name: Notify on failure (Slack/Telegram + Metrics)
+        if: failure()
+        env:
+          CI_FAILURE_EMOJI: "💥"
+          CI_FAILURE_TYPE: "tests"
+        run: |
+          ./notifiers/slack_notify.sh "Tests/Analysis failed on PHP ${{ matrix.php }} — ${{ github.repository }}"
+          ./notifiers/telegram_notify.sh "Tests/Analysis failed on PHP ${{ matrix.php }} — ${{ github.repository }}"
+          python monitoring/ci_failure_exporter.py "$CI_FAILURE_TYPE"
