@@ -1,7 +1,8 @@
-# OrderComponent — Iteration 8 (Inventory & Payment Integration)
+# OrderComponent — Iteration 9 (Shipment + REST API via API Platform)
 
-- Реальный workflow переход `place` и `pay`
-- Inventory: интерфейс + InMemory реализация, резерв при `place()`
-- Payments: `PaymentGatewayInterface`, `StripeGateway`, `PaymentProcessorService`, сущность `OrderPayment`
-- `OrderWorkflowService`: `place()` → reserve; `pay(amount)` → charge + transition to `paid`
-- Интеграционный тест: Kernel + SQLite, проверка резерва и записи платежа
+- API Platform 3: /orders (POST), /orders/{id} (GET), /orders/{id}/pay (POST), /orders/{id}/ship (POST)
+- Entities: Order, OrderItem, OrderPayment, OrderShipment
+- Services: Payment (Stripe stub), Shipment (UPS stub), Workflow transitions pay→ship→complete
+- State Processor: OrderDataPersister builds Order from OrderInput DTO
+- Controllers: OrderPayController, OrderShipController
+- Tests: RestApiFunctionalTest (KernelBrowser), Kernel config with API Platform + Doctrine + Workflow

@@ -4,8 +4,7 @@ namespace OrderComponent\Service\Order;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order;
-use OrderComponent\Entity\Order\OrderItem;
-use OrderComponent\Service\Inventory\InventoryServiceInterface;
+use OrderComponent\Service\Shipment\ShipmentProcessorService;
 use OrderComponent\Service\Payment\PaymentProcessorService;
 use OrderComponent\ValueObject\Order\OrderStatus;
 
@@ -14,23 +13,21 @@ final class OrderWorkflowService
     public function __construct(
         private readonly WorkflowInterface $workflow,
         private readonly EntityManagerInterface $em,
-        private readonly InventoryServiceInterface $inventory,
+        private readonly ShipmentProcessorService $shipper,
         private readonly PaymentProcessorService $payments
     ) {}
 
-    /** @param OrderItem[] $items */
-    public function place(Order $order, array $items): void
+    public function pay(Order $order, int $amount): void
     {
-        $this->apply($order, 'place');
-        $this->inventory->reserve($items);
+        $this->payments->charge($order, $amount);
+        $this->apply($order, 'pay');
         $this->em->flush();
     }
 
-    public function pay(Order $order, int $amount): void
+    public function ship(Order $order): void
     {
-        // charge first (atomic with DB)
-        $payment = $this->payments->charge($order, $amount);
-        $this->apply($order, 'pay');
+        $this->shipper->ship($order, 'UPS');
+        $this->apply($order, 'ship');
         $this->em->flush();
     }
 
@@ -41,8 +38,8 @@ final class OrderWorkflowService
         }
         $this->workflow->apply($order, $transition);
         $order->setStatus(match($transition){
-            'place' => OrderStatus::Placed,
             'pay' => OrderStatus::Paid,
+            'ship' => OrderStatus::Shipped,
             default => $order->getStatus()
         });
         $this->em->persist($order);

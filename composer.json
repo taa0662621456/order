@@ -1,6 +1,6 @@
 {
-  "name": "order/component-iteration8-inventory-payment",
-  "description": "Order Component Iteration 8: Inventory & Payment integration with real workflow transition 'pay' and OrderPayment entity",
+  "name": "order/component-iteration9-apiplatform",
+  "description": "Order Component Iteration 9: Shipment + REST API via API Platform with HTTP functional tests",
   "type": "library",
   "license": "MIT",
   "require": {
@@ -10,8 +10,15 @@
     "symfony/config": "^7.0",
     "symfony/console": "^7.0",
     "symfony/workflow": "^7.0",
+    "symfony/http-foundation": "^7.0",
+    "symfony/http-kernel": "^7.0",
+    "symfony/routing": "^7.0",
+    "symfony/serializer-pack": "*",
+    "symfony/validator": "^7.0",
     "doctrine/orm": "^3.0",
-    "doctrine/doctrine-bundle": "^2.12"
+    "doctrine/doctrine-bundle": "^2.12",
+    "api-platform/core": "^3.2",
+    "nelmio/cors-bundle": "^2.4"
   },
   "require-dev": {
     "symfony/test-pack": "^1.0"
