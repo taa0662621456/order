@@ -1,0 +1,20 @@
+security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+  providers:
+    in_memory: { memory: null }
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    api:
+      pattern: ^/(orders|metrics|healthz)
+      stateless: true
+      jwt: ~
+
+  access_control:
+    - { path: ^/metrics, roles: PUBLIC_ACCESS }   # можно закрыть по роли, если нужно
+    - { path: ^/healthz, roles: PUBLIC_ACCESS }
+    - { path: ^/orders, roles: IS_AUTHENTICATED_FULLY }
