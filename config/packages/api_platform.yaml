@@ -1,11 +1,11 @@
 api_platform:
   title: 'OrderComponent API'
   version: '0.3.0-rc'
-  mapping:
-    paths: ['%kernel.project_dir%/src']
   graphql:
     enabled: true
   formats:
     jsonld: [ 'application/ld+json' ]
     json: [ 'application/json' ]
     html: [ 'text/html' ]
+  mapping:
+    paths: [ '%kernel.project_dir%/src' ]
