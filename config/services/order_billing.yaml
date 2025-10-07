@@ -1,0 +1,3 @@
+services:
+  OrderComponent\Subscriber\Order\PaymentStatusSubscriber:
+    tags: ['kernel.event_subscriber']

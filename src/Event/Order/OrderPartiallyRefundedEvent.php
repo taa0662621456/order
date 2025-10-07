@@ -1,14 +1,5 @@
 <?php
 declare(strict_types=1);
-
-namespace OrderComponent\\Event\\Order;
-
-final readonly class OrderPartiallyRefundedEvent
-{
-    public function __construct(
-        public string $orderId,
-        public string $amount,
-        public string $currency,
-        public ?string $reason = null
-    ) {}
-}
+namespace OrderComponent\Event\Order;
+use OrderComponent\Entity\Order\Order;
+final class OrderPartiallyRefundedEvent { public function __construct(public readonly Order $order, public readonly string $refundAmount, public readonly string $balanceAmount){} }
