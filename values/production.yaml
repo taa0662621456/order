@@ -1,0 +1,5 @@
+image:
+  app: ghcr.io/taa0662621456/order-php:latest
+  nginx: ghcr.io/taa0662621456/order-nginx:latest
+monitoring:
+  enabled: true

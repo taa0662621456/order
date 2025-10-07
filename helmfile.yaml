@@ -1,0 +1,26 @@
+repositories:
+  - name: order
+    url: oci://ghcr.io/{{ env "GITHUB_REPOSITORY_OWNER" }}/helm-charts
+
+environments:
+  staging:
+    values:
+      - values/staging.yaml
+  production:
+    values:
+      - values/production.yaml
+
+releases:
+  - name: order-staging
+    namespace: order-staging
+    chart: order/ordercomponent
+    version: {{ env "ORDER_CHART_VERSION" | default "v1.0.0" }}
+    values:
+      - values/staging.yaml
+
+  - name: order-prod
+    namespace: order-prod
+    chart: order/ordercomponent
+    version: {{ env "ORDER_CHART_VERSION" | default "v1.0.0" }}
+    values:
+      - values/production.yaml

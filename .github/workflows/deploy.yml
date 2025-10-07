@@ -1,0 +1,402 @@
+name: Order — Full CI/CD (Helm + Docker + QA + Caching + Releases)
+
+on:
+  push:
+    branches: [ main, develop, release/**, feature/** ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: order-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  PHP_VERSIONS: '8.2,8.3'
+  APP_IMAGE: ghcr.io/${{ github.repository_owner }}/order-php
+  NGINX_IMAGE: ghcr.io/${{ github.repository_owner }}/order-nginx
+  CHART_DIR: deploy/order/charts/ordercomponent
+  CHART_DIST: deploy/order/dist
+  HELMFILE: deploy/order/helmfile.yaml
+  STAGING_NS: order-staging
+  PROD_NS: order-prod
+  CHART_REPO: ghcr.io/${{ github.repository_owner }}/helm-charts
+  HELM_REGISTRY: oci://ghcr.io/${{ github.repository_owner }}/helm-charts
+
+jobs:
+  prepare:
+    name: Prepare / Cache keys
+    runs-on: ubuntu-latest
+    outputs:
+      composer-key: ${{ steps.ck.outputs.key }}
+      buildx-key: ${{ steps.bk.outputs.key }}
+      helm-key: ${{ steps.hk.outputs.key }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: ck
+        run: echo "key=composer-${{ hashFiles('**/composer.lock') }}" >> "$GITHUB_OUTPUT"
+      - id: bk
+        run: echo "key=buildx-${{ github.ref_name }}-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+      - id: hk
+        run: echo "key=helm-${{ hashFiles('deploy/order/charts/ordercomponent/Chart.yaml') }}" >> "$GITHUB_OUTPUT"
+
+  qa:
+    name: QA (PHPUnit + Static Analysis)
+    runs-on: ubuntu-latest
+    needs: prepare
+    strategy:
+      matrix: { php: [ '8.2', '8.3' ] }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Composer vendor
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ~/.composer/cache/files
+          key: ${{ needs.prepare.outputs.composer-key }}-${{ matrix.php }}
+          restore-keys: ${{ needs.prepare.outputs.composer-key }}-
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          extensions: mbstring, intl, pdo_pgsql, pcntl, zip
+          coverage: none
+
+      - name: Install deps
+        run: composer install --no-interaction --prefer-dist
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit --colors=always
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=1G || true
+
+      - name: Psalm
+        run: vendor/bin/psalm --no-cache || true
+
+      - name: Rector (dry-run)
+        run: vendor/bin/rector process --dry-run || true
+
+      - name: Upload QA artifacts (if any)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-${{ matrix.php }}
+          path: |
+            build/**/*
+            var/build/**/*
+          if-no-files-found: ignore
+
+  helm_lint_package:
+    name: Helm Lint & Package (+cache)
+    runs-on: ubuntu-latest
+    needs: qa
+    env:
+      HELM_EXPERIMENTAL_OCI: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Helm index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/helm
+          key: ${{ needs.prepare.outputs.helm-key }}
+          restore-keys: helm-
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Helm lint
+        run: helm lint $CHART_DIR
+
+      - name: Helm package
+        run: |
+          mkdir -p $CHART_DIST
+          helm package $CHART_DIR -d $CHART_DIST
+
+      - name: Upload chart artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-chart
+          path: ${{ env.CHART_DIST }}/*.tgz
+
+  docker_build:
+    name: Docker Build & Push (php/nginx) with Buildx cache
+    runs-on: ubuntu-latest
+    needs: helm_lint_package
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Buildx layers (restore)
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ needs.prepare.outputs.buildx-key }}
+          restore-keys: buildx-
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Push PHP
+        id: build_php
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.APP_IMAGE }}:latest
+            ${{ env.APP_IMAGE }}:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Build & Push NGINX
+        id: build_nginx
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.NGINX_IMAGE }}:latest
+            ${{ env.NGINX_IMAGE }}:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      - name: Move buildx cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
+
+      - name: Export image digests
+        run: |
+          echo "${{ steps.build_php.outputs.digest }}" > app-image-digest.txt
+          echo "${{ steps.build_nginx.outputs.digest }}" > nginx-image-digest.txt
+
+      - name: Upload digests
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-digests
+          path: |
+            app-image-digest.txt
+            nginx-image-digest.txt
+
+  deploy_staging:
+    name: Deploy Staging + Helm tests
+    runs-on: ubuntu-latest
+    needs: docker_build
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: order-chart
+          path: chart_dist
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: image-digests
+          path: digests
+
+      - name: Setup Helm & Helmfile
+        run: |
+          sudo snap install helm --classic
+          curl -sSL https://github.com/roboll/helmfile/releases/latest/download/helmfile_linux_amd64 -o /usr/local/bin/helmfile
+          chmod +x /usr/local/bin/helmfile
+
+      - name: Kubeconfig (staging)
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBECONFIG_DATA}" | base64 -d > ~/.kube/config
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_STAGING_B64 }}
+
+      - name: Helmfile apply (staging)
+        run: helmfile -f $HELMFILE apply -e staging
+
+      - name: Helm tests (staging)
+        run: helm test order-staging --namespace $STAGING_NS
+
+      - name: Slack notify (staging)
+        if: always()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "*Order — STAGING:* ${{ job.status }}",
+              "attachments": [
+                { "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                  "fields": [
+                    { "title": "Ref", "value": "${{ github.ref }}", "short": true },
+                    { "title": "Commit", "value": "${{ github.sha }}", "short": true }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_STAGING }}
+
+  approve_prod:
+    name: Manual approval — Production
+    runs-on: ubuntu-latest
+    needs: deploy_staging
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: production
+      url: https://orders.example.com
+    steps:
+      - run: echo "Awaiting manual approval via protected environment…"
+
+  deploy_prod:
+    name: Deploy Production + tests + rollback
+    runs-on: ubuntu-latest
+    needs: approve_prod
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: order-chart
+          path: chart_dist
+
+      - name: Setup Helm & Helmfile
+        run: |
+          sudo snap install helm --classic
+          curl -sSL https://github.com/roboll/helmfile/releases/latest/download/helmfile_linux_amd64 -o /usr/local/bin/helmfile
+          chmod +x /usr/local/bin/helmfile
+
+      - name: Kubeconfig (prod)
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBECONFIG_DATA}" | base64 -d > ~/.kube/config
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_PROD_B64 }}
+
+      - name: Deploy via Helmfile (prod)
+        id: deploy
+        run: |
+          set -e
+          helmfile -f $HELMFILE apply -e production
+
+      - name: Helm tests (prod)
+        if: success()
+        run: helm test order-prod --namespace $PROD_NS
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "⚠️ Deployment failed, rolling back…"
+          RELEASE="order-prod"
+          LAST_REV=$(helm history $RELEASE -n $PROD_NS | tail -n 2 | head -n 1 | awk '{print $1}')
+          helm rollback $RELEASE $LAST_REV -n $PROD_NS || echo "Rollback failed"
+
+      - name: Slack notify (prod)
+        if: always()
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "*Order — PRODUCTION:* ${{ job.status }}",
+              "attachments": [
+                { "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                  "fields": [
+                    { "title": "Ref", "value": "${{ github.ref }}", "short": true },
+                    { "title": "Commit", "value": "${{ github.sha }}", "short": true }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_PROD }}
+
+  release_publish:
+    name: Publish Release (GHCR OCI + Docker tags)
+    runs-on: ubuntu-latest
+    needs: [deploy_prod]
+    if: startsWith(github.ref, 'refs/tags/v')
+    env:
+      TAG: ${{ github.ref_name }}
+      HELM_EXPERIMENTAL_OCI: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: order-chart
+          path: chart_dist
+
+      - name: Login GHCR (Docker + Helm)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Push Helm chart to GHCR (OCI)
+        run: |
+          CHART=$(ls chart_dist/*.tgz | head -n1)
+          helm push "$CHART" $HELM_REGISTRY
+
+      - name: Retag Docker images with release tag
+        run: |
+          docker buildx imagetools create -t $APP_IMAGE:${TAG} $APP_IMAGE:${{ github.sha }}
+          docker buildx imagetools create -t $NGINX_IMAGE:${TAG} $NGINX_IMAGE:${{ github.sha }}
+
+      - name: Slack notify (release)
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "*Order — RELEASE ${TAG}:* published",
+              "attachments": [
+                { "color": "good",
+                  "fields": [
+                    { "title": "Helm Chart", "value": "${{ env.HELM_REGISTRY }}/ordercomponent:${TAG}", "short": false },
+                    { "title": "Images", "value": "${{ env.APP_IMAGE }}:${TAG},  ${NGINX_IMAGE}:${TAG}", "short": false }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_PROD }}
+
+  cleanup:
+    name: Cleanup caches
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [qa, helm_lint_package, docker_build, deploy_staging, deploy_prod, release_publish]
+    steps:
+      - name: Docker prune & caches cleanup
+        run: |
+          docker system prune -af || true
+          rm -rf ~/.cache/composer || true
+          rm -rf ~/.cache/helm || true
+          rm -rf /tmp/.buildx-cache || true
