@@ -1,42 +1,28 @@
 <?php
 declare(strict_types=1);
-
 namespace OrderComponent\Entity\Order;
-
 use Doctrine\ORM\Mapping as ORM;
+use OrderComponent\Entity\Order;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'order_payment')]
+#[ORM\Table(name: 'order_payments')]
 class OrderPayment
 {
-    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Order::class, inversedBy: 'orderPayment')]
+    #[ORM\ManyToOne(targetEntity: Order::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Order $order;
 
-    #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
-    private string $amount;
+    #[ORM\Column(type: 'integer')]
+    private int $amount = 1000;
 
-    #[ORM\Column(length: 3)]
-    private string $currency;
-
-    #[ORM\Column(length: 64, unique: true)]
-    private string $externalRef;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $isPartial = true;
-
-    #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $capturedAt;
-
-    public function __construct(Order $order, string $amount, string $currency, string $externalRef, bool $isPartial = true)
-    {
-        $this->order = $order;
-        $this->amount = $amount;
-        $this->currency = strtoupper($currency);
-        $this->externalRef = $externalRef;
-        $this->isPartial = $isPartial;
-        $this->capturedAt = new \DateTimeImmutable();
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getOrder(): Order { return $this->order; }
+    public function setOrder(Order $order): void { $this->order = $order; }
+    public function getAmount(): int { return $this->amount; }
+    public function setAmount(int $amount): void { $this->amount = $amount; }
 }

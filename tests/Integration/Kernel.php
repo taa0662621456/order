@@ -5,8 +5,6 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
-use Doctrine\Migrations\DoctrineMigrationsBundle;
-use Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 use Zenstruck\Foundry\ZenstruckFoundryBundle;
 use OrderComponent\OrderComponentBundle;
 
@@ -17,8 +15,6 @@ final class TestKernel extends Kernel
         return [
             new FrameworkBundle(),
             new DoctrineBundle(),
-            new DoctrineMigrationsBundle(),
-            new DoctrineFixturesBundle(),
             new ZenstruckFoundryBundle(),
             new OrderComponentBundle(),
         ];
@@ -38,7 +34,7 @@ final class TestKernel extends Kernel
                         'dir': '%kernel.project_dir%/src/Entity',
                         'prefix': 'OrderComponent\\Entity'
                     }
-                }
+                ]
             ]
         ]);
     }

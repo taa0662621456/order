@@ -14,9 +14,7 @@ final class OrderFactory extends ModelFactory
     }
     protected function initialize(): self
     {
-        return $this->afterInstantiate(function(Order $order): void {
-            $order->initAudit();
-        });
+        return $this->afterInstantiate(function(Order $order): void { $order->initAudit(); });
     }
     protected static function getClass(): string { return Order::class; }
 }

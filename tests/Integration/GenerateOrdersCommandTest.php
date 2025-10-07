@@ -23,7 +23,7 @@ final class GenerateOrdersCommandTest extends TestCase
         self::$kernel->shutdown();
     }
 
-    public function testGenerateOrders(): void
+    public function testGenerateWithStatusSeedAndPayments(): void
     {
         $container = self::$kernel->getContainer();
         $em = $container->get(EntityManagerInterface::class);
@@ -34,14 +34,24 @@ final class GenerateOrdersCommandTest extends TestCase
         $schemaTool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         $app = new Application();
-        $app->add(new GenerateOrdersCommand());
+        $app->add($container->get(GenerateOrdersCommand::class));
+
         $tester = new CommandTester($app->find('order:generate'));
-        $tester->execute(['count' => 3]);
-        $display = $tester->getDisplay();
+        $tester->execute(['count' => 5, '--status' => 'paid', '--seed' => 123, '--with-payment' => true]);
+        $out = $tester->getDisplay();
 
-        $this->assertStringContainsString('Created 3 orders', $display);
+        $this->assertStringContainsString('Created 5 orders with payments', $out);
+        $this->assertStringContainsString('Status: paid', $out);
+        $this->assertStringContainsString('Payment amount: $1000', $out);
+        $this->assertStringContainsString('Payment total: $5000 (Общий платёж: $5000)', $out);
 
-        $count = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\\Entity\\Order o')->getSingleScalarResult();
-        $this->assertSame(3, $count);
+        // verify counts
+        $orders = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\\Entity\\Order o')->getSingleScalarResult();
+        $payments = (int)$em->createQuery('SELECT COUNT(p.id) FROM OrderComponent\\Entity\\Order\\OrderPayment p')->getSingleScalarResult();
+        $sum = (int)$em->createQuery('SELECT COALESCE(SUM(p.amount),0) FROM OrderComponent\\Entity\\Order\\OrderPayment p')->getSingleScalarResult();
+
+        $this->assertSame(5, $orders);
+        $this->assertSame(5, $payments);
+        $this->assertSame(5000, $sum);
     }
 }

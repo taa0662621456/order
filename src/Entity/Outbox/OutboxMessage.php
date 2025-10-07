@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
-
 namespace OrderComponent\Entity\Outbox;
-
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -14,49 +12,23 @@ class OutboxMessage
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 64)]
-    private string $aggregateId;
-
-    #[ORM\Column(length: 128)]
-    private string $eventType;
+    #[ORM\Column(type: 'string', length: 128)]
+    private string $eventName;
 
     #[ORM\Column(type: 'text')]
     private string $payload;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $occurredAt;
+    private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $dispatched = false;
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $dispatchedAt = null;
-
-    public function __construct(string $aggregateId, string $eventType, array $payload)
+    public function __construct(string $eventName, string $payload)
     {
-        $this->aggregateId = $aggregateId;
-        $this->eventType = $eventType;
-        $this->payload = json_encode($payload, JSON_THROW_ON_ERROR);
-        $this->occurredAt = new \DateTimeImmutable();
+        $this->eventName = $eventName;
+        $this->payload = $payload;
+        $this->createdAt = new \DateTimeImmutable('now');
     }
 
-    public function id(): ?int { return $this->id; }
-    public function markDispatched(): void
-    {
-        $this->dispatched = true;
-        $this->dispatchedAt = new \DateTimeImmutable();
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'id' => $this->id,
-            'aggregateId' => $this->aggregateId,
-            'eventType' => $this->eventType,
-            'payload' => json_decode($this->payload, true, 512, JSON_THROW_ON_ERROR),
-            'occurredAt' => $this->occurredAt->format(DATE_ATOM),
-            'dispatched' => $this->dispatched,
-            'dispatchedAt' => $this->dispatchedAt?->format(DATE_ATOM),
-        ];
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getEventName(): string { return $this->eventName; }
+    public function getPayload(): string { return $this->payload; }
 }
