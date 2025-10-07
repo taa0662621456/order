@@ -1,9 +1,20 @@
-# OrderComponent — Iteration 12 (RabbitMQ retry & DLQ)
+# OrderComponent — Iteration 13 (FullStack: RabbitMQ + Compose + CI)
 
-- Messenger:
-  - retry strategy: max_retries=3, delay=100ms, multiplier=2
-  - failure_transport: `failed`
-  - AMQP options include DLX (`messages.dlx`) with routing key `order.events.failed`
-- Outbox: publisher + dispatcher to async transport
-- Handler: intentionally fails for `OrderShippedEvent` to exercise retries → DLQ
-- E2E test spins Worker with in-memory transports and asserts message ends in failed queue
+Содержимое:
+- `docker/docker-compose.yml` — RabbitMQ 3-management, порт 5672/15672.
+- `.env.example` — DSN для Messenger и SQLite.
+- `.github/workflows/ci.yml` — GitHub Actions (PHP 8.2/8.3, amqp ext, запуск тестов).
+
+Интеграция:
+1) Скопируй `.env.example` в `.env` и при необходимости правь DSN.
+2) `docker compose -f docker/docker-compose.yml up -d`
+3) Запусти тесты: `composer install && vendor/bin/phpunit`.
+
+Подключение к предыдущим итерациям:
+- Скопируй папки `config/`, `src/`, `tests/` из Iteration 11–12 в корень этого проекта.
+- Убедись, что `config/packages/messenger.yaml` указывает `failure_transport` и DLX (см. Iteration 12).
+- Для локальной отладки используй in-memory транспорт в тест-конфиге.
+
+Примечания:
+- В CI поднимается сервис `rabbitmq`, DSN на `localhost:5672`.
+- Для продакшена добавь авторизацию и vhost, а также политику DLX/TTL на брокере.

@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports: [ "5672:5672", "15672:15672" ]
+        options: >-
+          --health-cmd="rabbitmq-diagnostics -q ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=6
+    strategy:
+      matrix:
+        php: [ "8.2", "8.3" ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: pdo_sqlite, amqp
+
+      - name: Validate composer
+        run: composer validate --strict
+        working-directory: ./
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+        working-directory: ./
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit -v
+        env:
+          APP_ENV: test
+          MESSENGER_TRANSPORT_DSN: amqp://guest:guest@localhost:5672/%2f/messages
+          MESSENGER_FAILURE_TRANSPORT_DSN: amqp://guest:guest@localhost:5672/%2f/messages.dlx
