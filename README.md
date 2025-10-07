@@ -1,9 +1,12 @@
-# OrderComponent — Iteration 1 (GeneratorPlus)
+# OrderComponent — Iteration 2 (Generator Extended)
 
 Commands:
-  php bin/console order:generate [count] [--status=<status>] [--seed=<int>] [--with-payment]
+  php bin/console order:generate [count]
+      [--status=<status>] [--seed=<int>] [--amount=<int>] [--currency=<ISO>] [--vendor=<id>] [--with-payment] [--with-shipment]
   php bin/console order:list
+  php bin/console order:stats
+  php bin/console order:clear
 
-- Generates orders (optionally with payments of $1000 each).
-- Bilingual totals: "Payment total: $N (Общий платёж: $N)".
-- Integration tests included.
+- Payments with amount/currency/method/status.
+- Shipments with carrier/tracking/shippedAt.
+- Stats show totals and average per order.
