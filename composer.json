@@ -1,0 +1,38 @@
+{
+  "name": "order/component",
+  "description": "Order Component for Symfony 6+/7 with services, events, repositories, and config.",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=8.2",
+    "symfony/framework-bundle": "^6.3 || ^7.0",
+    "symfony/dependency-injection": "^6.3 || ^7.0",
+    "symfony/config": "^6.3 || ^7.0",
+    "symfony/event-dispatcher": "^6.3 || ^7.0",
+    "doctrine/orm": "^2.18 || ^3.0",
+    "doctrine/doctrine-bundle": "^2.10"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5",
+    "phpstan/phpstan": "^1.11",
+    "vimeo/psalm": "^5.25",
+    "rector/rector": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "OrderComponent\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OrderComponent\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0-dev"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

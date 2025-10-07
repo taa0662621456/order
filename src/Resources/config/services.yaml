@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  # Load all PHP services within this bundle (excluding DI and Resources)
+  OrderComponent\:
+    resource: '../*'
+    exclude:
+      - '../DependencyInjection/'
+      - '../Resources/'
+
+  # Autotag Symfony Event Subscribers (autoconfigure handles EventSubscriberInterface).
+  # For plain listeners, you can tag explicitly:
+  # OrderComponent\Event\SomeListener:
+  #   tags: ['kernel.event_listener']

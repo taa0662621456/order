@@ -1,0 +1,7 @@
+services:
+  GeoIp2\Database\Reader:
+    arguments:
+      - '%kernel.project_dir%/var/geoip/GeoLite2-City.mmdb'
+  App\EventSubscriber\GeoIpBlockSubscriber:
+    arguments:
+      $allowedCountries: [ 'US', 'CA', 'UA' ]

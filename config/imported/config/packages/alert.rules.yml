@@ -1,0 +1,19 @@
+groups:
+  - name: ecommerce.rules
+    rules:
+      - alert: OutboxPending
+        expr: outbox_pending_total > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Outbox messages are pending"
+          description: "There are pending outbox messages for more than 5 minutes."
+      - alert: MessengerFailed
+        expr: messenger_failed_messages_total > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Messenger failed messages"
+          description: "There are failed messages in Messenger queue."
