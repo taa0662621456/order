@@ -1,46 +1,20 @@
-# Roadmap milestones for Order Component (α)
+# milestones.yml — Roadmap tracking
 milestones:
-  - title: "α-1 Domain Layer stabilized"
-    description: "Entities / Value Objects / Repositories / Domain Events"
-    labels: ["domain", "entity", "vo", "repository", "event"]
-    due_on: null
-    checklist:
-      - "Define Aggregates: Order, OrderItem, OrderPayment, OrderShipment"
-      - "Implement VO: Money, Currency, Taxation, Discount, Quantity, Sku"
-      - "Create Repositories and specs"
-      - "Domain Events emitted on state changes"
-  - title: "α-2 Transactional App Layer"
-    description: "Handlers / Bus / Outbox / Idempotency"
-    labels: ["app", "messenger", "outbox", "idempotency"]
-    due_on: null
-    checklist:
-      - "Commands & Handlers wired to Messenger"
-      - "Transactional boundary + rollback"
-      - "Outbox write & consumer process"
-      - "Idempotency keys enforced"
-  - title: "α-3 Pricing & Tax Engine"
-    description: "Promotion & Tax strategies + config"
-    labels: ["pricing", "tax", "config"]
-    due_on: null
-    checklist:
-      - "Pricing engine (base/discount/tax/shipping/fees)"
-      - "PromotionStrategyInterface, TaxationStrategyInterface"
-      - "Currency conversion & rounding policies"
-  - title: "α-4 Payment & Shipment modules"
-    description: "Gateways/Webhooks/Refunds + Carriers/Tracking"
-    labels: ["payment", "shipment", "integration"]
-    due_on: null
-    checklist:
-      - "Payment interfaces + adapters"
-      - "Webhook listeners to OrderPaidEvent"
-      - "Refund API"
-      - "Carrier strategy + tracking updates"
-  - title: "α-5 QA / CI/CD / Docs"
-    description: "Tests + CI + Docs + tag v0.1.0-alpha"
-    labels: ["qa", "ci", "docs"]
-    due_on: null
-    checklist:
-      - "Unit≥90%, Integration≥80%"
-      - "Static analysis gates (PHPStan/Psalm)"
-      - "GitHub Actions + artifacts"
-      - "Docs: README, OpenAPI, OrderSandboxApp"
+  - title: v0.2.0-alpha
+    due: 2025-11-01
+    items:
+      - DOMAIN: Partial Payment/Refund/Shipment
+      - APP: Commands/Handlers partial*, Outbox v2 (retry/backoff)
+      - TESTS: E2E full cycle
+  - title: v0.3.0-beta
+    due: 2025-12-01
+    items:
+      - Pricing Engine, CQRS projections
+      - Inventory Saga
+      - Repositories→Specification, Migrations
+  - title: v1.0.0
+    due: 2026-01-15
+    items:
+      - Multi-currency
+      - Observability metrics pack
+      - Performance & Quality gates
