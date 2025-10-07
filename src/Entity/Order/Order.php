@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use OrderComponent\Event\Order\OrderPartiallyPaidEvent;
+use OrderComponent\Contract\Domain\RecordsDomainEvents;
 use OrderComponent\Event\Order\OrderPaidEvent;
+use OrderComponent\Event\Order\OrderPartiallyPaidEvent;
 use OrderComponent\Event\Order\OrderPartiallyRefundedEvent;
 use OrderComponent\Event\Order\OrderRefundedEvent;
 use OrderComponent\Event\Order\OrderPartiallyShippedEvent;
@@ -13,7 +16,7 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'orders')]
-class Order
+class Order implements RecordsDomainEvents
 {
     #[ORM\Id]
     #[ORM\Column(type: 'guid')]
@@ -34,14 +37,17 @@ class Order
     #[ORM\Column(type: 'string', length: 32)]
     private string $status = 'draft';
 
+    /** @var Collection<int, OrderPayment> */
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderPayment::class, cascade: ['persist'], orphanRemoval: true)]
-    private iterable $orderPayment;
+    private Collection $orderPayment;
 
+    /** @var Collection<int, OrderRefund> */
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderRefund::class, cascade: ['persist'], orphanRemoval: true)]
-    private iterable $orderRefund;
+    private Collection $orderRefund;
 
+    /** @var Collection<int, OrderShipmentItem> */
     #[ORM\OneToMany(mappedBy: 'order', targetEntity: OrderShipmentItem::class, cascade: ['persist'], orphanRemoval: true)]
-    private iterable $orderShipment;
+    private Collection $orderShipment;
 
     /** @var array<int,object> */
     private array $recordedEvents = [];
@@ -51,6 +57,9 @@ class Order
         $this->id = Uuid::v7()->toRfc4122();
         $this->currency = strtoupper($currency);
         $this->grandTotal = $grandTotal;
+        $this->orderPayment = new ArrayCollection();
+        $this->orderRefund = new ArrayCollection();
+        $this->orderShipment = new ArrayCollection();
     }
 
     public function id(): string { return $this->id; }
@@ -65,12 +74,14 @@ class Order
         if ($this->status === 'draft') {
             $this->status = 'placed';
         }
-        $this->paidTotal = bcadd($this->paidTotal, $amount, 2);
 
+        $payment = new OrderPayment($this, $amount, $this->currency, $externalRef, $isPartial);
+        $this->orderPayment->add($payment);
+
+        $this->paidTotal = bcadd($this->paidTotal, $amount, 2);
         $event = $isPartial
             ? new OrderPartiallyPaidEvent($this->id, $amount, $this->currency, $externalRef)
             : new OrderPaidEvent($this->id, $amount, $this->currency, $externalRef);
-
         $this->record($event);
 
         if (bccomp($this->paidTotal, $this->grandTotal, 2) >= 0) {
@@ -83,6 +94,9 @@ class Order
 
     public function refundPartial(string $amount, ?string $reason = null, bool $isPartial = true): void
     {
+        $refund = new OrderRefund($this, $amount, $this->currency, $reason, $isPartial);
+        $this->orderRefund->add($refund);
+
         $this->refundedTotal = bcadd($this->refundedTotal, $amount, 2);
         if ($isPartial) {
             $this->status = 'partially_refunded';
@@ -96,8 +110,10 @@ class Order
 
     public function shipItems(int $count, ?string $note = null): void
     {
-        // Упрощенно: фиксируем событие partial ship, без детального связывания с OrderItem
-        $this->status = ($this->status === 'paid') ? 'partially_shipped' : $this->status;
+        $this->orderShipment->add(new OrderShipmentItem($this, $count, $note));
+        if ($this->status === 'paid') {
+            $this->status = 'partially_shipped';
+        }
         $this->record(new OrderPartiallyShippedEvent($this->id, $count, $note));
     }
 
