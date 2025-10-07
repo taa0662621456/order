@@ -24,7 +24,8 @@ final class TestKernel extends Kernel
                     'places' => ['draft','placed','paid','shipped','completed','cancelled','refunded'],
                     'transitions' => [
                         'place' => ['from'=>'draft','to'=>'placed'],
-                        'pay' => ['from'=>'placed','to'=>'paid']
+                        'pay' => ['from'=>'placed','to'=>'paid'],
+                        'ship' => ['from'=>'paid','to'=>'shipped']
                     ]
                 ]
             ]

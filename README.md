@@ -1,8 +1,11 @@
-# OrderComponent — Iteration 9 (Shipment + REST API via API Platform)
+# OrderComponent — Iteration 10 (Outbox Events + Domain Subscribers)
 
-- API Platform 3: /orders (POST), /orders/{id} (GET), /orders/{id}/pay (POST), /orders/{id}/ship (POST)
-- Entities: Order, OrderItem, OrderPayment, OrderShipment
-- Services: Payment (Stripe stub), Shipment (UPS stub), Workflow transitions pay→ship→complete
-- State Processor: OrderDataPersister builds Order from OrderInput DTO
-- Controllers: OrderPayController, OrderShipController
-- Tests: RestApiFunctionalTest (KernelBrowser), Kernel config with API Platform + Doctrine + Workflow
+- Outbox pattern:
+  - `Entity/Outbox/OutboxMessage.php`
+  - `Service/Outbox/{OutboxPublisher, OutboxProcessor}`
+  - CLI: `order:outbox:process`
+- Workflow publishes events to outbox: `place`, `pay`, `ship`
+- Subscribers:
+  - InventorySubscriber (stub), EmailSubscriber (stub), AnalyticsSubscriber (persists AnalyticsRecord on OrderPaidEvent)
+- Integration test:
+  - Creates order, executes place+pay, processes outbox, asserts analytics record persisted

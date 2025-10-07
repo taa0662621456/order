@@ -4,30 +4,36 @@ namespace OrderComponent\Service\Order;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order;
-use OrderComponent\Service\Shipment\ShipmentProcessorService;
-use OrderComponent\Service\Payment\PaymentProcessorService;
 use OrderComponent\ValueObject\Order\OrderStatus;
+use OrderComponent\Service\Outbox\OutboxPublisher;
+use OrderComponent\Event\Order\{OrderPlacedEvent, OrderPaidEvent, OrderShippedEvent};
 
 final class OrderWorkflowService
 {
     public function __construct(
         private readonly WorkflowInterface $workflow,
         private readonly EntityManagerInterface $em,
-        private readonly ShipmentProcessorService $shipper,
-        private readonly PaymentProcessorService $payments
+        private readonly OutboxPublisher $outbox
     ) {}
 
-    public function pay(Order $order, int $amount): void
+    public function place(Order $order): void
     {
-        $this->payments->charge($order, $amount);
+        $this->apply($order, 'place');
+        $this->outbox->publish(OrderPlacedEvent::class, ['orderId' => $order->getId()]);
+        $this->em->flush();
+    }
+
+    public function pay(Order $order): void
+    {
         $this->apply($order, 'pay');
+        $this->outbox->publish(OrderPaidEvent::class, ['orderId' => $order->getId()]);
         $this->em->flush();
     }
 
     public function ship(Order $order): void
     {
-        $this->shipper->ship($order, 'UPS');
         $this->apply($order, 'ship');
+        $this->outbox->publish(OrderShippedEvent::class, ['orderId' => $order->getId()]);
         $this->em->flush();
     }
 
@@ -38,6 +44,7 @@ final class OrderWorkflowService
         }
         $this->workflow->apply($order, $transition);
         $order->setStatus(match($transition){
+            'place' => OrderStatus::Placed,
             'pay' => OrderStatus::Paid,
             'ship' => OrderStatus::Shipped,
             default => $order->getStatus()

@@ -18,27 +18,13 @@ class OutboxMessage
     #[ORM\Column(type: 'text')]
     private string $payload;
 
-    #[ORM\Column(type: 'integer')]
-    private int $retryCount = 0;
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $failedAt = null;
-
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
     public function __construct(string $eventName, string $payload)
-    {
-        $this->eventName = $eventName;
-        $this->payload = $payload;
-        $this->createdAt = new \DateTimeImmutable('now');
-    }
+    { $this->eventName=$eventName; $this->payload=$payload; $this->createdAt=new \DateTimeImmutable('now'); }
 
     public function getId(): ?int { return $this->id; }
     public function getEventName(): string { return $this->eventName; }
     public function getPayload(): string { return $this->payload; }
-    public function getRetryCount(): int { return $this->retryCount; }
-    public function incRetry(): void { $this->retryCount++; }
-    public function getFailedAt(): ?\DateTimeImmutable { return $this->failedAt; }
-    public function failNow(): void { $this->failedAt = new \DateTimeImmutable('now'); }
 }

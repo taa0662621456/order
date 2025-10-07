@@ -1,24 +1,17 @@
 <?php
 declare(strict_types=1);
-
 namespace OrderComponent\Service\Outbox;
-
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Outbox\OutboxMessage;
-use OrderComponent\Messenger\Message\OutboxDispatchedMessage;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final class OutboxPublisher
 {
-    public function __construct(
-        private EntityManagerInterface $em,
-        private MessageBusInterface $bus
-    ) {}
-
-    public function storeAndPublish(string $aggregateId, string $eventType, array $payload): void
+    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function publish(string $eventName, array $payload): void
     {
-        $outbox = new OutboxMessage($aggregateId, $eventType, $payload);
-        $this->em->persist($outbox);
-        $this->bus->dispatch(new OutboxDispatchedMessage($eventType, $payload));
+        $json = json_encode($payload, JSON_THROW_ON_ERROR);
+        $m = new OutboxMessage($eventName, $json);
+        $this->em->persist($m);
+        // Do not flush here — rely on transaction boundary
     }
 }

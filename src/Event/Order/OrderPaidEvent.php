@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Event\Order;
-use OrderComponent\Entity\Order;
 final class OrderPaidEvent
 {
-    public function __construct(public readonly Order $order) { }
-    public function getName(): string { return self::class; }
+    public function __construct(public readonly int $orderId) { }
+    public function name(): string { return self::class; }
 }

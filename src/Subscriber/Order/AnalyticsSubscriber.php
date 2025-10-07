@@ -2,23 +2,22 @@
 declare(strict_types=1);
 namespace OrderComponent\Subscriber\Order;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use OrderComponent\Event\Order\OrderPlacedEvent;
-use OrderComponent\Event\Order\OrderPaidEvent;
-use OrderComponent\Event\Order\OrderShippedEvent;
-use OrderComponent\Event\Order\OrderCancelledEvent;
-use OrderComponent\Event\Order\OrderRefundedEvent;
+use Doctrine\ORM\EntityManagerInterface;
+use OrderComponent\Entity\Analytics\AnalyticsRecord;
 
 final class AnalyticsSubscriber implements EventSubscriberInterface
 {
+    public function __construct(private readonly EntityManagerInterface $em) {}
     public static function getSubscribedEvents(): array
     {
         return [
-            OrderPlacedEvent::class => 'onEvent',
-            OrderPaidEvent::class => 'onEvent',
-            OrderShippedEvent::class => 'onEvent',
-            OrderCancelledEvent::class => 'onEvent',
-            OrderRefundedEvent::class => 'onEvent',
+            'OrderComponent\\Event\\Order\\OrderPaidEvent' => 'onPaid'
         ];
     }
-    public function onEvent(object $e): void { /* push metrics */ }
+    public function onPaid(object $event): void
+    {
+        $orderId = (int)($event->orderId ?? 0);
+        $this->em->persist(new AnalyticsRecord('paid', $orderId));
+        $this->em->flush();
+    }
 }
