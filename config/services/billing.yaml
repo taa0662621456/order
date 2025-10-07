@@ -1,0 +1,6 @@
+services:
+  OrderComponent\Service\Order\Billing\PaymentProcessor: ~
+  OrderComponent\Service\Order\Billing\BillingService:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@OrderComponent\Service\Order\Billing\PaymentProcessor'
