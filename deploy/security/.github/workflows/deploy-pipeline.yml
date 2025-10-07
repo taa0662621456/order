@@ -1,0 +1,80 @@
+name: Order CI/CD
+on:
+  push: { branches: [ main, release/* ] }
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: { php-version: 8.3, extensions: mbstring, pdo_pgsql, intl }
+      - run: composer install --no-interaction --no-progress --prefer-dist || true
+      - run: vendor/bin/phpunit --testdox || true
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/order-php:latest
+            ghcr.io/${{ github.repository_owner }}/order-nginx:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install helm & helmfile
+        run: |
+          sudo snap install helm --classic || true
+          curl -sSL https://github.com/roboll/helmfile/releases/latest/download/helmfile_linux_amd64             -o /usr/local/bin/helmfile && chmod +x /usr/local/bin/helmfile
+      - name: Deploy via Helmfile
+        id: deploy
+        run: |
+          set -e
+          helmfile -f deploy/order/helmfile.yaml apply -e production
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      - name: Rollback if failed
+        if: failure()
+        run: |
+          echo "⚠️ Deployment failed, rolling back..."
+          RELEASE="order-prod"
+          LAST_REV=$(helm history $RELEASE -n order-prod | tail -n 2 | head -n 1 | awk '{print $1}')
+          helm rollback $RELEASE $LAST_REV -n order-prod || echo "Rollback failed"
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    steps:
+      - name: Slack Notify (env-aware)
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "text": "*Order CI/CD Result:* ${{ job.status }}",
+              "attachments": [
+                {
+                  "color": "${{ job.status == 'success' && 'good' || 'danger' }}",
+                  "fields": [
+                    { "title": "Environment", "value": "${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}", "short": true },
+                    { "title": "Repository", "value": "${{ github.repository }}", "short": true },
+                    { "title": "Commit", "value": "${{ github.sha }}", "short": false }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ github.ref == 'refs/heads/main' && secrets.SLACK_WEBHOOK_URL_PROD || secrets.SLACK_WEBHOOK_URL_STAGING }}

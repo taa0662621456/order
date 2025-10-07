@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: order-app }
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector: { matchLabels: { app: order-app } }
+  template:
+    metadata: { labels: { app: order-app } }
+    spec:
+      securityContext: {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: php
+          image: {{ .Values.app.phpImage | quote }}
+          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports: [{ containerPort: 9000 }]
+          livenessProbe:
+            httpGet: { path: "{{ .Values.app.probes.liveness.path }}", port: 80 }
+            initialDelaySeconds: {{ .Values.app.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.probes.liveness.periodSeconds }}
+          readinessProbe:
+            httpGet: { path: "{{ .Values.app.probes.readiness.path }}", port: 80 }
+            initialDelaySeconds: {{ .Values.app.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.app.probes.readiness.periodSeconds }}
+        - name: nginx
+          image: {{ .Values.app.nginxImage | quote }}
+          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports: [{ containerPort: 80 }]

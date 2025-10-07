@@ -1,0 +1,2 @@
+# Separate images example kept minimal (php-fpm and nginx built separately in CI)
+# php Dockerfile should live in its own repo or path; this is a placeholder.

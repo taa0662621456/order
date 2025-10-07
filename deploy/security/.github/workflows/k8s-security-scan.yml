@@ -1,0 +1,32 @@
+name: K8s Security Scan
+on: [push, pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Kubescape (Helm chart scan)
+        uses: kubescape/github-action@v3
+        with:
+          frameworks: 'nsa,cis-eks'
+          files: 'deploy/order/charts/ordercomponent'
+          format: 'sarif'
+          outputFile: 'kubescape.sarif'
+      - name: Trivy config scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: 'config'
+          scanners: 'misconfig'
+          exit-code: '1'
+          format: 'sarif'
+          output: 'trivy.sarif'
+          hide-progress: true
+          input: 'deploy/order/charts/ordercomponent'
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy.sarif'
+      - name: Upload Kubescape SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'kubescape.sarif'

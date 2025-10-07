@@ -1,0 +1,31 @@
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile: { type: RuntimeDefault }
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities: { drop: ["ALL"] }
+
+app:
+  replicas: 1
+  phpImage: ghcr.io/your-org/order-php:latest
+  nginxImage: nginx:1.27-alpine
+  probes:
+    liveness: { path: /healthz, initialDelaySeconds: 20, periodSeconds: 15 }
+    readiness:{ path: /readiness, initialDelaySeconds: 10, periodSeconds: 10 }
+
+worker:
+  replicas: 1
+  image: ghcr.io/your-org/order-php:latest
+  command: ["php","bin/console","messenger:consume","async","-vv","--time-limit=0","--memory-limit=512M"]
+  probes:
+    liveness: { cmd: ["php","-v"], initialDelaySeconds: 15, periodSeconds: 20 }
+    readiness:{ cmd: ["php","-v"], initialDelaySeconds: 5,  periodSeconds: 15 }
+
+service:
+  type: ClusterIP
+  port: 80
