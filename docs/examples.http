@@ -1,0 +1,23 @@
+### Create Order
+POST http://localhost/orders
+Content-Type: application/json
+
+{
+  "currency": "USD",
+  "items": [
+    {"sku": "SKU-1", "quantity": 2, "unitPrice": 1000},
+    {"sku": "SKU-2", "quantity": 1, "unitPrice": 5000}
+  ]
+}
+
+### Pay
+POST http://localhost/orders/1/pay
+Content-Type: application/json
+
+{ "amount": 7000 }
+
+### Ship
+POST http://localhost/orders/1/ship
+
+### Get
+GET http://localhost/orders/1
