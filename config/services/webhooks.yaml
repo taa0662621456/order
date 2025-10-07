@@ -1,0 +1,14 @@
+services:
+  OrderComponent\Service\Order\Billing\IdempotencyGuard:
+    arguments: ['@doctrine.orm.entity_manager']
+
+  OrderComponent\Service\Order\Billing\WebhookHandler:
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@OrderComponent\Service\Order\Billing\IdempotencyGuard'
+
+  OrderComponent\Service\Order\Billing\RefundService:
+    arguments: ['@doctrine.orm.entity_manager']
+
+  OrderComponent\Controller\Webhook\PaymentWebhookController:
+    tags: ['controller.service_arguments']

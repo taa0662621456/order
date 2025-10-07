@@ -1,14 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace OrderComponent\\Event\\Order;
+namespace OrderComponent\Event\Order;
 
-final readonly class OrderRefundedEvent
+use OrderComponent\Entity\Order\Order;
+
+final class OrderRefundedEvent
 {
-    public function __construct(
-        public string $orderId,
-        public string $amount,
-        public string $currency,
-        public ?string $reason = null
-    ) {}
+    public function __construct(public readonly Order $order, public readonly string $amount) {}
 }
