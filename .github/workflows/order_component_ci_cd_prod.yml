@@ -9,11 +9,11 @@ on:
 
 jobs:
   build-test:
-    name: Build & Test (PHP 8.2 / 8.3)
+    name: Build & Test (PHP 8.2 / 8.3 /8.4)
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [ '8.2', '8.3' ]
+        php: [ '8.2', '8.3', '8.4' ]
     services:
       postgres:
         image: postgres:15

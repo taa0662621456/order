@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
-        with: { php-version: '8.3', extensions: amqp, intl, pdo_pgsql, tools: composer:v2 }
+        with: { php-version: '8.4', extensions: amqp, intl, pdo_pgsql, tools: composer:v2 }
       - name: Install deps
         run: composer install --no-interaction --no-progress
       - name: Run Rector (auto-fix)
