@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class RefundWebhookTest extends WebTestCase
 {
+    /**
+     * @throws \JsonException
+     */
     public function test_refund_webhook_happy_path(): void
     {
         $client = static::createClient();

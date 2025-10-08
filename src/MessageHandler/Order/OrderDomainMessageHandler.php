@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use OrderComponent\Message\Order\OrderDomainMessage;
 
-final class OrderDomainMessageHandler implements MessageHandlerInterface
+final readonly class OrderDomainMessageHandler implements MessageHandlerInterface
 {
     public function __construct(private LoggerInterface $logger) {}
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order\Billing;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use OrderComponent\ValueObject\Order\InvoiceNumber;
 use OrderComponent\Entity\Order\Order;
@@ -30,7 +31,7 @@ class OrderInvoice
     private string $amountTax;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $issuedAt;
+    private DateTimeImmutable $issuedAt;
 
     public function __construct(Order $order, InvoiceNumber $invoiceNumber, string $amountTotal, string $amountTax)
     {
@@ -38,7 +39,7 @@ class OrderInvoice
         $this->invoiceNumber = $invoiceNumber;
         $this->amountTotal = $amountTotal;
         $this->amountTax = $amountTax;
-        $this->issuedAt = new \DateTimeImmutable();
+        $this->issuedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -46,5 +47,5 @@ class OrderInvoice
     public function getInvoiceNumber(): InvoiceNumber { return $this->invoiceNumber; }
     public function getAmountTotal(): string { return $this->amountTotal; }
     public function getAmountTax(): string { return $this->amountTax; }
-    public function getIssuedAt(): \DateTimeImmutable { return $this->issuedAt; }
+    public function getIssuedAt(): DateTimeImmutable { return $this->issuedAt; }
 }

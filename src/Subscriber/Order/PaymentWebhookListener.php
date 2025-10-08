@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use OrderComponent\Service\Order\PaymentService;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 
-final class PaymentWebhookListener implements EventSubscriberInterface
+final readonly class PaymentWebhookListener implements EventSubscriberInterface
 {
     public function __construct(private PaymentService $service, private TransactionalEventPublisher $publisher) {}
 

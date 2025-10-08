@@ -10,13 +10,16 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use OrderComponent\Service\Order\WebhookIdempotencyService;
 use OrderComponent\Message\Order\OrderRefundCommand;
 
-final class RefundWebhookController
+final readonly class RefundWebhookController
 {
     public function __construct(
         private WebhookIdempotencyService $idem,
-        private MessageBusInterface $bus
+        private MessageBusInterface       $bus
     ) {}
 
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     #[Route('/webhooks/refund', name: 'order_refund_webhook', methods: ['POST'])]
     public function __invoke(Request $req): JsonResponse
     {

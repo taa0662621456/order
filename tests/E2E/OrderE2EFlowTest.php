@@ -17,6 +17,10 @@ final class OrderE2EFlowTest extends WebTestCase
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
     }
 
+    /**
+     * @throws \JsonException
+     * @throws \Exception
+     */
     public function test_full_order_payment_refund_flow(): void
     {
         $client = static::createClient();

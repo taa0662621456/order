@@ -8,12 +8,12 @@ use OrderComponent\ReadModel\Entity\OrderView;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderPaymentTransactionRepositoryInterface;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderRefundTransactionRepositoryInterface;
 
-final class OrderReadModelUpdater
+final readonly class OrderReadModelUpdater
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private EntityManagerInterface                     $em,
         private OrderPaymentTransactionRepositoryInterface $payments,
-        private OrderRefundTransactionRepositoryInterface $refunds
+        private OrderRefundTransactionRepositoryInterface  $refunds
     ) {}
 
     public function recalc(string $orderId, string $grandTotal): void

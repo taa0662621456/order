@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -19,12 +20,12 @@ class IdempotencyKey
     private string $keyHash;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct(string $key)
     {
         $this->keyHash = hash('sha256', $key);
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function keyHash(): string { return $this->keyHash; }

@@ -9,9 +9,9 @@ use OrderComponent\Entity\Order\OrderItem;
 use OrderComponent\ValueObject\Money\Currency;
 use OrderComponent\ValueObject\Order\{Sku, Quantity};
 
-final class OrderDataPersister implements ProcessorInterface
+final readonly class OrderDataPersister implements ProcessorInterface
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em) {}
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if(!$data instanceof OrderInput) return $data;

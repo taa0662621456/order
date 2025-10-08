@@ -5,7 +5,7 @@ namespace OrderComponent\Event\Order;
 
 use OrderComponent\Entity\Order\Order;
 
-final class OrderRefundedEvent
+final readonly class OrderRefundedEvent
 {
-    public function __construct(public readonly Order $order, public readonly string $amount) {}
+    public function __construct(public Order $order, public string $amount) {}
 }

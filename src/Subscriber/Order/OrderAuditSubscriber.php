@@ -3,14 +3,16 @@ declare(strict_types=1);
 
 namespace OrderComponent\Subscriber\Order;
 
+use Cassandra\Uuid;
+use DateTimeInterface;
+use ReflectionClass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Uid\Uuid;
 use OrderComponent\Entity\Order\OrderEventRecord;
 use OrderComponent\Entity\Order\OrderAuditLog;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderEventRepositoryInterface;
 
-final class OrderAuditSubscriber implements EventSubscriberInterface
+final readonly class OrderAuditSubscriber implements EventSubscriberInterface
 {
     public function __construct(private EntityManagerInterface $em, private OrderEventRepositoryInterface $repo) {}
 
@@ -40,7 +42,7 @@ final class OrderAuditSubscriber implements EventSubscriberInterface
         $record = new OrderEventRecord($eventId, $orderId, $name, $payload);
         $this->repo->save($record);
 
-        $action = (new \ReflectionClass($event))->getShortName();
+        $action = (new ReflectionClass($event))->getShortName();
         $audit = new OrderAuditLog(Uuid::v7()->toRfc4122(), $orderId, $action, json_encode($payload, JSON_UNESCAPED_SLASHES));
         $this->em->persist($audit);
         // Без flush здесь — внеший unit-of-work контролирует транзакцию
@@ -71,7 +73,7 @@ final class OrderAuditSubscriber implements EventSubscriberInterface
     private function normalizeValue(mixed $v): mixed
     {
         return match(true) {
-            $v instanceof \DateTimeInterface => $v->format(DATE_ATOM),
+            $v instanceof DateTimeInterface => $v->format(DATE_ATOM),
             is_object($v) => (array)$v,
             default => $v
         };

@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use Nelmio\CorsBundle\NelmioCorsBundle;
 use OrderComponent\OrderComponentBundle;
+use function dirname;
 
 final class TestKernel extends Kernel
 {
@@ -20,8 +21,8 @@ final class TestKernel extends Kernel
         $c->extension('framework', ['secret'=>'test','test'=>true]);
         $c->extension('doctrine', [
             'dbal' => ['url' => 'sqlite:///%kernel.cache_dir%/test.db'],
-            'orm' => ['auto_mapping'=>true, 'mappings'=>{'OrderComponent':{'is_bundle':False,'type':'attribute','dir':'%kernel.project_dir%/src/Entity','prefix':'OrderComponent\\Entity'}}]
-        ]);
+            'orm' => ['auto_mapping'=>true, 'mappings'=>{'OrderComponent':{'is_bundle':False,'type':'attribute','dir':'%kernel.project_dir%/src/Entity','prefix':'OrderComponent\Entity'}}]
+        ])
     }
-    public function getProjectDir(): string { return \dirname(__DIR__, 3); }
+    public function getProjectDir(): string { return dirname(__DIR__, 3); }
 }

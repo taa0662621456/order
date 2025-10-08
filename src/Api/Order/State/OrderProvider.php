@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\ReadModel\Entity\OrderView;
 use OrderComponent\Api\Order\Resource\OrderResource;
 
-final class OrderProvider implements ProviderInterface
+final readonly class OrderProvider implements ProviderInterface
 {
     public function __construct(private EntityManagerInterface $em) {}
 

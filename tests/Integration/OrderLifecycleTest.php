@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,7 +30,7 @@ final class OrderLifecycleTest extends TestCase
         $em = $container->get(EntityManagerInterface::class);
 
         // Ensure schema exists
-        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool = new SchemaTool($em);
         $classes = $em->getMetadataFactory()->getAllMetadata();
         $schemaTool->dropSchema($classes);
         $schemaTool->createSchema($classes);

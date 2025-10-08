@@ -4,9 +4,9 @@ namespace OrderComponent\Service\Outbox;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Outbox\IdempotencyKey;
 
-final class IdempotencyGuard
+final readonly class IdempotencyGuard
 {
-    public function __construct(private readonly EntityManagerInterface $em){}
+    public function __construct(private EntityManagerInterface $em){}
 
     public function alreadyProcessed(string $key): bool
     {

@@ -25,7 +25,7 @@ class OrderShipment
 
     #[ORM\Column(type: 'string', length: 64, nullable: true)]
     #[Groups(['order:read'])]
-    private ?string $trackingNumber = null;
+    private ?string $trackingNumber;
 
     #[ORM\Column(type: 'string', length: 16)]
     #[Groups(['order:read'])]

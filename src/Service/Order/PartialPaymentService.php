@@ -6,7 +6,7 @@ namespace OrderComponent\Service\Order;
 use OrderComponent\Entity\Order\OrderPaymentTransaction;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderPaymentTransactionRepositoryInterface;
 
-final class PartialPaymentService
+final readonly class PartialPaymentService
 {
     public function __construct(private OrderPaymentTransactionRepositoryInterface $payments) {}
 

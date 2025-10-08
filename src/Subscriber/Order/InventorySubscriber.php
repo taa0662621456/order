@@ -8,8 +8,8 @@ final class InventorySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'OrderComponent\\Event\\Order\\OrderPlacedEvent' => 'onPlaced',
-            'OrderComponent\\Event\\Order\\OrderCancelledEvent' => 'onCancelled'
+            'OrderComponent\Event\Order\OrderPlacedEvent' => 'onPlaced',
+            'OrderComponent\Event\Order\OrderCancelledEvent' => 'onCancelled'
         ];
     }
     public function onPlaced(object $event): void { /* reserve stock */ }

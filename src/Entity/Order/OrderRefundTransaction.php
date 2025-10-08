@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -25,10 +26,10 @@ class OrderRefundTransaction
     private string $refundId;
 
     #[ORM\Column(type: 'string', length: 128, nullable: true)]
-    private ?string $reason = null;
+    private ?string $reason;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct(string $orderId, string $amount, string $refundId, ?string $reason = null)
     {
@@ -36,7 +37,7 @@ class OrderRefundTransaction
         $this->amount = $amount;
         $this->refundId = $refundId;
         $this->reason = $reason;
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
     }
 
     public function id(): int { return $this->id; }

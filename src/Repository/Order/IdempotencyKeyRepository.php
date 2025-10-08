@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\IdempotencyKey;
 use OrderComponent\Interface\RepositoryInterface\Order\IdempotencyKeyRepositoryInterface;
 
-final class IdempotencyKeyRepository implements IdempotencyKeyRepositoryInterface
+final readonly class IdempotencyKeyRepository implements IdempotencyKeyRepositoryInterface
 {
     public function __construct(private EntityManagerInterface $em) {}
 

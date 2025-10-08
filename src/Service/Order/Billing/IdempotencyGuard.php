@@ -6,9 +6,9 @@ namespace OrderComponent\Service\Order\Billing;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\Billing\PaymentWebhookLog;
 
-final class IdempotencyGuard
+final readonly class IdempotencyGuard
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function checkAndPersist(string $provider, string $eventId, string $payload): bool
     {

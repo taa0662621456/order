@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace OrderComponent\ValueObject\Order;
 
+use DomainException;
+
 final class Discount
 {
     private ?string $percent;
@@ -25,7 +27,7 @@ final class Discount
         }
         if ($this->fixed !== null) {
             if (!$base->getCurrency()->equals($this->fixed->getCurrency())) {
-                throw new \DomainException('Currency mismatch in Discount');
+                throw new DomainException('Currency mismatch in Discount');
             }
             return $base->subtract($this->fixed);
         }

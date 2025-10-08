@@ -8,7 +8,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Symfony\Validator\Constraints\Sequentially;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
 use OrderComponent\Entity\Order\Billing\OrderInvoice;
 
 #[ApiResource(

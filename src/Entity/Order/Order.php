@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order;
 
+use Cassandra\Uuid;
 use Doctrine\ORM\Mapping as ORM;
+use DomainException;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\{ApiResource, Get, GetCollection, Post, Put, Delete};
-use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'orders')]
@@ -34,7 +35,7 @@ class Order
 
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
     #[Groups(['order:read','order:write'])]
-    private string $grandTotal = '0.00';
+    private string $grandTotal;
 
     #[ORM\Column(type: 'decimal', precision: 12, scale: 2)]
     #[Groups(['order:read'])]
@@ -66,8 +67,8 @@ class Order
 
     public function applyPartialPayment(string $amount, string $ref): void
     {
-        if (bccomp($amount, '0.00', 2) <= 0) { throw new \DomainException('Payment amount must be > 0'); }
-        if (bccomp(bcadd($this->paidTotal, $amount, 2), $this->grandTotal, 2) > 0) { throw new \DomainException('Payment exceeds order grand total'); }
+        if (bccomp($amount, '0.00', 2) <= 0) { throw new DomainException('Payment amount must be > 0'); }
+        if (bccomp(bcadd($this->paidTotal, $amount, 2), $this->grandTotal, 2) > 0) { throw new DomainException('Payment exceeds order grand total'); }
         if ($this->status === 'draft') { $this->status = 'placed'; }
         $this->paidTotal = bcadd($this->paidTotal, $amount, 2);
         $this->status = bccomp($this->paidTotal, $this->grandTotal, 2) >= 0 ? 'paid' : 'partially_paid';
@@ -75,10 +76,10 @@ class Order
 
     public function refundPartial(string $amount, ?string $reason = null): void
     {
-        if (bccomp($amount, '0.00', 2) <= 0) { throw new \DomainException('Refund amount must be > 0'); }
-        if (bccomp($this->paidTotal, '0.00', 2) <= 0) { throw new \DomainException('Cannot refund unpaid order'); }
+        if (bccomp($amount, '0.00', 2) <= 0) { throw new DomainException('Refund amount must be > 0'); }
+        if (bccomp($this->paidTotal, '0.00', 2) <= 0) { throw new DomainException('Cannot refund unpaid order'); }
         $available = bcsub($this->paidTotal, $this->refundedTotal, 2);
-        if (bccomp($amount, $available, 2) > 0) { throw new \DomainException('Refund exceeds paid amount'); }
+        if (bccomp($amount, $available, 2) > 0) { throw new DomainException('Refund exceeds paid amount'); }
         $this->refundedTotal = bcadd($this->refundedTotal, $amount, 2);
         if (bccomp($this->refundedTotal, $this->paidTotal, 2) >= 0) {
             $this->status = 'refunded';
@@ -89,9 +90,9 @@ class Order
 
     public function shipItems(int $count, ?string $note = null): void
     {
-        if ($count <= 0) { throw new \DomainException('Shipment count must be > 0'); }
+        if ($count <= 0) { throw new DomainException('Shipment count must be > 0'); }
         if (!in_array($this->status, ['paid', 'partially_shipped'], true)) {
-            throw new \DomainException('Cannot ship before order is fully paid');
+            throw new DomainException('Cannot ship before order is fully paid');
         }
         $this->status = 'partially_shipped';
     }

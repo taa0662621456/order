@@ -8,6 +8,9 @@ use OrderComponent\Service\Order\Billing\IdempotencyGuard;
 
 final class IdempotencyGuardTest extends KernelTestCase
 {
+    /**
+     * @throws \JsonException
+     */
     public function test_check_and_persist_behaviour(): void
     {
         self::bootKernel();

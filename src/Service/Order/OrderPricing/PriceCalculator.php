@@ -5,9 +5,9 @@ use OrderComponent\Entity\Order;
 use OrderComponent\Entity\Order\OrderItem;
 use OrderComponent\Service\Order\OrderPricing\Strategy\{FlatPromotionStrategy,FlatTaxationStrategy};
 
-final class PriceCalculator
+final readonly class PriceCalculator
 {
-    public function __construct(private readonly FlatPromotionStrategy $promotion, private readonly FlatTaxationStrategy $taxation) {}
+    public function __construct(private FlatPromotionStrategy $promotion, private FlatTaxationStrategy $taxation) {}
     /** @param OrderItem[] $items */
     public function recalc(Order $order, array $items): void
     {

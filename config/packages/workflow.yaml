@@ -2,7 +2,7 @@ framework:
   workflows:
     order:
       type: 'state_machine'
-      supports: OrderComponent\\Entity\\Order\\Order
+      supports: OrderComponent\Entity\Order\Order
       initial_marking: draft
       places: [draft, placed, partially_paid, paid, partially_shipped, refunded, completed]
       transitions:

@@ -17,7 +17,10 @@ final class OutboxMessageRepository extends ServiceEntityRepository
         parent::__construct($registry, OutboxMessage::class);
     }
 
-    /** @return iterable<OutboxMessage> */
+    /**
+     * @param int $limit
+     * @return iterable<OutboxMessage>
+     */
     public function findUnpublishedBatch(int $limit = 100): iterable
     {
         return $this->createQueryBuilder('o')

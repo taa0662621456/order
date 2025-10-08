@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order\Billing;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use OrderComponent\Entity\Order\Order;
 use OrderComponent\ValueObject\Order\PaymentStatus;
@@ -33,7 +34,7 @@ class OrderTransaction
     private string $currency;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $processedAt;
+    private DateTimeImmutable $processedAt;
 
     public function __construct(Order $order, string $externalId, string $amount, string $currency)
     {
@@ -42,7 +43,7 @@ class OrderTransaction
         $this->amount = $amount;
         $this->currency = $currency;
         $this->status = PaymentStatus::pending();
-        $this->processedAt = new \DateTimeImmutable();
+        $this->processedAt = new DateTimeImmutable();
     }
 
     public function getId(): ?int { return $this->id; }

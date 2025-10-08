@@ -6,8 +6,9 @@ namespace OrderComponent\Infrastructure\Monitoring;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Throwable;
 
-final class HealthCheckController
+final readonly class HealthCheckController
 {
     public function __construct(private Connection $db) {}
 
@@ -17,7 +18,7 @@ final class HealthCheckController
         try {
             $this->db->executeQuery('SELECT 1')->fetchOne();
             return new JsonResponse(['status' => 'ok', 'db' => true], 200);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return new JsonResponse(['status' => 'fail', 'db' => false, 'error' => $e->getMessage()], 500);
         }
     }

@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
-namespace OrderComponent\Tests\E2E;
+namespace OrderComponent\Tests\Order\E2E;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Worker;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Psr\Log\NullLogger;
 use OrderComponent\Entity\Order;
@@ -23,11 +24,15 @@ final class RetryAndDLQTest extends TestCase
     }
     public static function tearDownAfterClass(): void { self::$kernel->shutdown(); }
 
+    /**
+     * @throws \JsonException
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     public function testFailureGoesToDeadLetter(): void
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $tool = new SchemaTool($em);
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 

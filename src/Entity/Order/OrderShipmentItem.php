@@ -19,7 +19,7 @@ class OrderShipmentItem
     private int $quantity;
 
     #[ORM\Column(length: 64, nullable: true)]
-    private ?string $note = null;
+    private ?string $note;
 
     public function __construct(Order $order, int $quantity, ?string $note = null)
     {

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +22,7 @@ final class WorkflowPricingIntegrationTest extends TestCase
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $tool = new SchemaTool($em);
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 

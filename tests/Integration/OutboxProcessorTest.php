@@ -1,11 +1,12 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Service\Outbox\OutboxProcessor;
-use OrderComponent\Service\Outbox\IdempotencyGuard;
 use OrderComponent\Entity\Outbox\OutboxMessage;
 
 final class OutboxProcessorTest extends TestCase
@@ -18,7 +19,7 @@ final class OutboxProcessorTest extends TestCase
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $tool = new SchemaTool($em);
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
@@ -35,7 +36,7 @@ final class OutboxProcessorTest extends TestCase
         $processed = $proc->replay(50,
             function(OutboxMessage $m) use (&$dispatchCount) {
                 if ($m->getEventName() === 'OrderShippedEvent') {
-                    throw new \RuntimeException('simulate failure');
+                    throw new RuntimeException('simulate failure');
                 }
                 return (object)['name'=>$m->getEventName(), 'payload'=>$m->getPayload()];
             },
@@ -46,11 +47,11 @@ final class OutboxProcessorTest extends TestCase
 
         // Re-run to cause retries and dead-letter
         $proc->replay(50,
-            fn(OutboxMessage $m) => throw new \RuntimeException('fail again'),
+            fn(OutboxMessage $m) => throw new RuntimeException('fail again'),
             fn(object $e) => null,
             2
         );
-        $dead = (int)$em->createQuery('SELECT COUNT(m.id) FROM OrderComponent\\Entity\\Outbox\\OutboxMessage m WHERE m.failedAt IS NOT NULL')->getSingleScalarResult();
+        $dead = (int)$em->createQuery('SELECT COUNT(m.id) FROM OrderComponent\Entity\Outbox\OutboxMessage m WHERE m.failedAt IS NOT NULL')->getSingleScalarResult();
         $this->assertSame(1, $dead, 'One message dead-lettered');
 
         $this->assertGreaterThanOrEqual(1, $dispatchCount, 'At least one dispatch occurred');

@@ -6,9 +6,9 @@ namespace OrderComponent\Service\Order\Pricing;
 use OrderComponent\ValueObject\Order\Money;
 use OrderComponent\ValueObject\Order\Discount;
 
-final class DefaultPromotionStrategy implements PromotionStrategyInterface
+final readonly class DefaultPromotionStrategy implements PromotionStrategyInterface
 {
-    public function __construct(private readonly ?Discount $discount = null) {}
+    public function __construct(private ?Discount $discount = null) {}
 
     public function discount(Money $subtotal): Money
     {

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'order:outbox:replay', description: 'Publish outbox messages via Messenger transport')]
 final class OutboxReplayCommand extends Command
 {
-    public function __construct(private OutboxPublisher $publisher)
+    public function __construct(private readonly OutboxPublisher $publisher)
     {
         parent::__construct();
     }

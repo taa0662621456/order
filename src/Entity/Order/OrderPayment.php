@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -25,18 +26,18 @@ class OrderPayment
     private string $externalRef;
 
     #[ORM\Column(type: 'boolean')]
-    private bool $isPartial = true;
+    private bool $isPartial;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $capturedAt;
+    private DateTimeImmutable $capturedAt;
 
-    public function __construct(Order $order, string $amount, string $currency, string $externalRef, bool $isPartial = true)
+    public function __construct(Order $order, string $amount, int $currency, string $externalRef, bool $isPartial = true)
     {
         $this->order = $order;
         $this->amount = $amount;
         $this->currency = strtoupper($currency);
         $this->externalRef = $externalRef;
         $this->isPartial = $isPartial;
-        $this->capturedAt = new \DateTimeImmutable();
+        $this->capturedAt = new DateTimeImmutable();
     }
 }

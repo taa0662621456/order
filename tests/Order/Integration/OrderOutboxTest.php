@@ -5,10 +5,8 @@ namespace Tests\Order\Integration;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 use OrderComponent\Service\Order\OutboxRelay;
-use OrderComponent\Repository\Order\OutboxRepository;
 
 final class OrderOutboxTest extends KernelTestCase
 {

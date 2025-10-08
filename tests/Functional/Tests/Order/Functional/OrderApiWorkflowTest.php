@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\\Functional;
+namespace Tests\Order\Functional;
 
-use PHPUnit\\Framework\\TestCase;
+use PHPUnit\Framework\TestCase;
 
 final class OrderApiWorkflowTest extends TestCase
 {

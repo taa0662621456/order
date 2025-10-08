@@ -10,12 +10,12 @@ use OrderComponent\Service\Order\ShipmentService;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 
 #[AsMessageHandler]
-final class OrderShipmentCommandHandler
+final readonly class OrderShipmentCommandHandler
 {
     public function __construct(
-        private ShipmentService $service,
+        private ShipmentService             $service,
         private TransactionalEventPublisher $publisher,
-        private CarrierInterface $carrier
+        private CarrierInterface            $carrier
     ) {}
 
     public function __invoke(OrderShipmentCommand $cmd): void

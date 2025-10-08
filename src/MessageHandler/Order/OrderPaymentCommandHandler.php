@@ -11,12 +11,12 @@ use OrderComponent\Service\Order\PaymentService;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 
 #[AsMessageHandler]
-final class OrderPaymentCommandHandler
+final readonly class OrderPaymentCommandHandler
 {
     public function __construct(
-        private PaymentService $service,
+        private PaymentService              $service,
         private TransactionalEventPublisher $publisher,
-        private PaymentGatewayInterface $gateway
+        private PaymentGatewayInterface     $gateway
     ) {}
 
     public function __invoke(OrderPaymentCommand $cmd): void

@@ -8,10 +8,13 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use OrderComponent\Message\Order\OrderRefundCommand;
 
-final class OrderRefundProcessor implements ProcessorInterface
+final readonly class OrderRefundProcessor implements ProcessorInterface
 {
     public function __construct(private MessageBusInterface $bus) {}
 
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         $id = $uriVariables['id'] ?? null;

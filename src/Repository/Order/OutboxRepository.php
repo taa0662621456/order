@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace OrderComponent\Repository\Order;
 
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\OutboxMessage;
 use OrderComponent\Interface\RepositoryInterface\Order\OutboxRepositoryInterface;
 
-final class OutboxRepository implements OutboxRepositoryInterface
+final readonly class OutboxRepository implements OutboxRepositoryInterface
 {
     public function __construct(private EntityManagerInterface $em) {}
 
@@ -24,7 +25,7 @@ final class OutboxRepository implements OutboxRepositoryInterface
             ->where('m.status = :st')
             ->andWhere('m.availableAt IS NULL OR m.availableAt <= :now')
             ->setParameter('st', OutboxMessage::STATUS_PENDING)
-            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('now', new DateTimeImmutable())
             ->orderBy('m.id', 'ASC')
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();

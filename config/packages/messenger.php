@@ -12,12 +12,12 @@ return static function (ContainerConfigurator $c): void {
                 ]
             ],
             'routing' => [
-                'OrderComponent\\Message\\OrderMessage' => 'order_outbox'
+                'OrderComponent\Message\OrderMessage' => 'order_outbox'
             ],
             'buses' => [
                 'messenger.bus.default' => [
                     'default_middleware' => 'allow_no_handlers',
-                    'middleware' => ['OrderComponent\\Middleware\\IdempotencyMiddleware']
+                    'middleware' => ['OrderComponent\Middleware\IdempotencyMiddleware']
                 ]
             ]
         ]

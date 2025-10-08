@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace OrderComponent\ValueObject\Order;
 
+use DomainException;
+use InvalidArgumentException;
+
 final class Money
 {
     private string $amount; // string decimal for precision
@@ -11,7 +14,7 @@ final class Money
     public function __construct(string $amount, Currency $currency)
     {
         if (!preg_match('/^-?\d+(?:\.\d+)?$/', $amount)) {
-            throw new \InvalidArgumentException('Invalid decimal for Money: ' . $amount);
+            throw new InvalidArgumentException('Invalid decimal for Money: ' . $amount);
         }
         $this->amount = $amount;
         $this->currency = $currency;
@@ -56,12 +59,12 @@ final class Money
     private function assertSameCurrency(self $other): void
     {
         if (!$this->currency->equals($other->currency)) {
-            throw new \DomainException('Currency mismatch: ' . $this->currency . ' vs ' . $other->currency);
+            throw new DomainException('Currency mismatch: ' . $this->currency . ' vs ' . $other->currency);
         }
     }
 
     public function __toString(): string
     {
-        return $this->amount . ' ' . (string)$this->currency;
+        return $this->amount . ' ' . $this->currency;
     }
 }

@@ -7,11 +7,11 @@ use OrderComponent\Entity\Order\IdempotencyKey;
 use OrderComponent\Interface\RepositoryInterface\Order\IdempotencyKeyRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class WebhookIdempotencyService
+final readonly class WebhookIdempotencyService
 {
     public function __construct(
         private IdempotencyKeyRepositoryInterface $repo,
-        private EntityManagerInterface $em
+        private EntityManagerInterface            $em
     ) {}
 
     /** @return bool true if accepted (first time), false if duplicate */

@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use OrderComponent\Service\Order\ShipmentService;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 
-final class ShipmentStatusListener implements EventSubscriberInterface
+final readonly class ShipmentStatusListener implements EventSubscriberInterface
 {
     public function __construct(private ShipmentService $service, private TransactionalEventPublisher $publisher) {}
 

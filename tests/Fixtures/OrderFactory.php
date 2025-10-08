@@ -6,9 +6,9 @@ namespace Tests\Fixtures;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\Order;
 
-final class OrderFactory
+final readonly class OrderFactory
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em) {}
 
     public function create(float $total = 100.00): Order
     {

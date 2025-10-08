@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\Application;
@@ -29,7 +30,7 @@ final class GenerateOrdersCommandTest extends TestCase
         $em = $container->get(EntityManagerInterface::class);
 
         // reset schema
-        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool = new SchemaTool($em);
         $schemaTool->dropDatabase();
         $schemaTool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
@@ -46,9 +47,9 @@ final class GenerateOrdersCommandTest extends TestCase
         $this->assertStringContainsString('Payment total: $5000 (Общий платёж: $5000)', $out);
 
         // verify counts
-        $orders = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\\Entity\\Order o')->getSingleScalarResult();
-        $payments = (int)$em->createQuery('SELECT COUNT(p.id) FROM OrderComponent\\Entity\\Order\\OrderPayment p')->getSingleScalarResult();
-        $sum = (int)$em->createQuery('SELECT COALESCE(SUM(p.amount),0) FROM OrderComponent\\Entity\\Order\\OrderPayment p')->getSingleScalarResult();
+        $orders = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\Entity\Order o')->getSingleScalarResult();
+        $payments = (int)$em->createQuery('SELECT COUNT(p.id) FROM OrderComponent\Entity\Order\OrderPayment p')->getSingleScalarResult();
+        $sum = (int)$em->createQuery('SELECT COALESCE(SUM(p.amount),0) FROM OrderComponent\Entity\Order\OrderPayment p')->getSingleScalarResult();
 
         $this->assertSame(5, $orders);
         $this->assertSame(5, $payments);

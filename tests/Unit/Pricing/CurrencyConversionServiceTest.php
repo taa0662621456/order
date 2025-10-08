@@ -13,7 +13,7 @@ final class CurrencyConversionServiceTest extends TestCase
     {
         $fx = new CurrencyConversionService(__DIR__ . '/../../../config/exchange_rates.yaml');
         $money = new Money('100.00', new Currency('USD'));
-        $eur = $fx->convert($money, new Currency('EUR'), 2);
+        $eur = $fx->convert($money, new Currency('EUR'));
         $this->assertNotEmpty($eur->getAmount());
         $this->assertSame('EUR', (string)$eur->getCurrency());
     }

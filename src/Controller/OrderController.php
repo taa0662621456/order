@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace OrderComponent\\Controller;
+namespace OrderComponent\Controller;
 
-use OrderComponent\\DTO\\Order\\OrderCreateDTO;
-use OrderComponent\\DTO\\Order\\OrderPaymentDTO;
-use OrderComponent\\DTO\\Order\\OrderShipmentDTO;
-use OrderComponent\\Entity\\Order\\Order;
-use Symfony\\Component\\HttpFoundation\\JsonResponse;
-use Symfony\\Component\\HttpFoundation\\Request;
-use Symfony\\Component\\Routing\\Attribute\\Route;
-use Symfony\\Component\\Validator\\Validator\\ValidatorInterface;
-use Doctrine\\ORM\\EntityManagerInterface;
+use DomainException;
+use OrderComponent\DTO\Order\OrderCreateDTO;
+use OrderComponent\DTO\Order\OrderPaymentDTO;
+use OrderComponent\DTO\Order\OrderShipmentDTO;
+use OrderComponent\Entity\Order\Order;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/order')]
-final class OrderController
+final readonly class OrderController
 {
     public function __construct(private EntityManagerInterface $em, private ValidatorInterface $validator) {}
 
@@ -63,7 +63,7 @@ final class OrderController
         try {
             $o->applyPartialPayment($dto->amount, $dto->externalRef, true);
             $this->em->flush();
-        } catch (\\DomainException $e) {
+        } catch (DomainException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
         return new JsonResponse(['id' => $o->id(), 'status' => $o->status(), 'paidTotal' => $o->paidTotal()]);
@@ -83,7 +83,7 @@ final class OrderController
         try {
             $o->shipItems($dto->count, $dto->note);
             $this->em->flush();
-        } catch (\\DomainException $e) {
+        } catch (DomainException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
         return new JsonResponse(['id' => $o->id(), 'status' => $o->status()]);
@@ -102,7 +102,7 @@ final class OrderController
         try {
             $o->refundPartial($amount, $reason);
             $this->em->flush();
-        } catch (\\DomainException $e) {
+        } catch (DomainException $e) {
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
         return new JsonResponse(['id' => $o->id(), 'status' => $o->status(), 'refundedTotal' => $o->refundedTotal()]);

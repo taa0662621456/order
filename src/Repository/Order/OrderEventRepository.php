@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\OrderEventRecord;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderEventRepositoryInterface;
 
-final class OrderEventRepository implements OrderEventRepositoryInterface
+final readonly class OrderEventRepository implements OrderEventRepositoryInterface
 {
     public function __construct(private EntityManagerInterface $em) {}
 

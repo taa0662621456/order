@@ -12,6 +12,7 @@ use OrderComponent\Service\Outbox\{OutboxPublisher, OutboxMessengerDispatcher};
 use OrderComponent\Api\State\OrderDataPersister;
 use OrderComponent\Api\Controller\{OrderPayController, OrderShipController};
 use OrderComponent\MessageHandler\OrderEventMessageHandler;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $c): void {
     $s = $c->services()->defaults()->autowire()->autoconfigure();

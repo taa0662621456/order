@@ -6,10 +6,11 @@ namespace OrderComponent\Message\Handler\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Message\Command\Order\OrderPartialShipCommand;
 use OrderComponent\Entity\Order\Order;
+use RuntimeException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class OrderPartialShipHandler
+final readonly class OrderPartialShipHandler
 {
     public function __construct(private EntityManagerInterface $em) {}
 
@@ -17,11 +18,11 @@ final class OrderPartialShipHandler
     {
         $order = $this->em->getRepository(Order::class)->find($cmd->orderId);
         if (!$order) {
-            throw new \RuntimeException('Order not found');
+            throw new RuntimeException('Order not found');
         }
         $order->shipItems($cmd->count, $cmd->note);
 
-        foreach ($order->releaseEvents() as $event) {
+        foreach ($order->releaseEvents() as $ignored) {
             // outbox write (упрощённо)
         }
 

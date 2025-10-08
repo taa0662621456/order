@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace OrderComponent\Service\Order\Pricing;
 
-use Symfony\Component\Yaml\Yaml;
+use RectorPrefix202411\Symfony\Component\Yaml\Yaml;
+use RuntimeException;
 use OrderComponent\ValueObject\Order\{Money, Currency};
 
 final class CurrencyConversionService implements ExchangeRateProviderInterface
@@ -25,7 +26,7 @@ final class CurrencyConversionService implements ExchangeRateProviderInterface
         $from = strtoupper($from); $to = strtoupper($to);
         if ($from === $to) return 1.0;
         if (!isset($this->rates[$from]) || !isset($this->rates[$to])) {
-            throw new \RuntimeException("Rate not found for $from or $to");
+            throw new RuntimeException("Rate not found for $from or $to");
         }
         $usdAmount = 1.0 / (float)$this->rates[$from];
         return $usdAmount * (float)$this->rates[$to];

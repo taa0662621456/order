@@ -11,13 +11,17 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use RuntimeException;
 
 #[AsMessageHandler(bus: 'messenger.bus.commands')]
-final class OrderPayHandler
+final readonly class OrderPayHandler
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private OutboxPublisher $outbox
+        private OutboxPublisher        $outbox
     ) {}
 
+    /**
+     * @throws \JsonException
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     public function __invoke(OrderPayCommand $cmd): void
     {
         /** @var Order|null $order */

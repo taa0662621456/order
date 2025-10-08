@@ -1,9 +1,10 @@
 <?php
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\Transport\InMemoryTransport;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use OrderComponent\Entity\Order;
 use OrderComponent\Entity\Order\OrderItem;
 use OrderComponent\ValueObject\Order\{Sku, Quantity};
@@ -20,7 +21,7 @@ final class OutboxMessengerIntegrationTest extends TestCase
     public function testWorkflowToQueue(): void
     {
         $c=self::$kernel->getContainer(); $em=$c->get(EntityManagerInterface::class);
-        $tool=new \Doctrine\ORM\Tools\SchemaTool($em); $tool->dropDatabase(); $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
+        $tool=new SchemaTool($em); $tool->dropDatabase(); $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         $o=new Order(); $o->setCurrency(new Currency('USD')); $em->persist($o);
         $i1=new OrderItem($o,new Sku('SKU-1'), new Quantity(2), 1000);

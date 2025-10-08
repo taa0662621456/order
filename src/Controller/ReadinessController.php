@@ -5,9 +5,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-final class ReadinessController
+final readonly class ReadinessController
 {
-    public function __construct(private readonly TransportInterface $asyncTransport) {}
+    public function __construct(private TransportInterface $asyncTransport) {}
 
     #[Route('/readiness', name: 'readiness', methods: ['GET'])]
     public function __invoke(): JsonResponse

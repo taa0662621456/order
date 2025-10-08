@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\OrderRefundTransaction;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderRefundTransactionRepositoryInterface;
 
-final class OrderRefundTransactionRepository implements OrderRefundTransactionRepositoryInterface
+final readonly class OrderRefundTransactionRepository implements OrderRefundTransactionRepositoryInterface
 {
     public function __construct(private EntityManagerInterface $em) {}
 

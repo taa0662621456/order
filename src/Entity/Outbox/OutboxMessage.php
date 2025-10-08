@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Outbox;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -24,29 +25,35 @@ class OutboxMessage
     private string $payload;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeImmutable $occurredAt;
+    private DateTimeImmutable $occurredAt;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $dispatched = false;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $dispatchedAt = null;
+    private ?DateTimeImmutable $dispatchedAt = null;
 
-    public function __construct(string $aggregateId, string $eventType, array $payload)
+    /**
+     * @throws \JsonException
+     */
+    public function __construct(string $aggregateId, array $eventType, array $payload)
     {
         $this->aggregateId = $aggregateId;
         $this->eventType = $eventType;
         $this->payload = json_encode($payload, JSON_THROW_ON_ERROR);
-        $this->occurredAt = new \DateTimeImmutable();
+        $this->occurredAt = new DateTimeImmutable();
     }
 
     public function id(): ?int { return $this->id; }
     public function markDispatched(): void
     {
         $this->dispatched = true;
-        $this->dispatchedAt = new \DateTimeImmutable();
+        $this->dispatchedAt = new DateTimeImmutable();
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function toArray(): array
     {
         return [

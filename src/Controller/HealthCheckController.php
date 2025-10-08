@@ -5,10 +5,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Throwable;
 
-final class HealthCheckController
+final readonly class HealthCheckController
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly TransportInterface $asyncTransport) {}
+    public function __construct(private EntityManagerInterface $em, private TransportInterface $asyncTransport) {}
 
     #[Route('/healthz', name: 'healthz', methods: ['GET'])]
     public function __invoke(): JsonResponse
@@ -17,7 +18,7 @@ final class HealthCheckController
             $this->em->getConnection()->executeQuery('SELECT 1')->fetchOne();
             $rabbitOk = method_exists($this->asyncTransport, 'get') || method_exists($this->asyncTransport, '__toString');
             return new JsonResponse(['status'=>'ok','rabbitmq'=>$rabbitOk], 200);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return new JsonResponse(['status'=>'fail','error'=>$e->getMessage()], 500);
         }
     }

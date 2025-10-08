@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order;
 use OrderComponent\Service\Order\OrderWorkflowService;
-use OrderComponent\Entity\Outbox\IdempotencyKey;
 use OrderComponent\Message\OrderMessage;
 
 final class MessengerIntegrationTest extends TestCase
@@ -20,7 +20,7 @@ final class MessengerIntegrationTest extends TestCase
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $tool = new SchemaTool($em);
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
@@ -33,9 +33,9 @@ final class MessengerIntegrationTest extends TestCase
         $svc->place($o); // should publish OrderPlaced → handled synchronously in test via sync transport
         // publish duplicate
         $bus = $c->get('messenger.default_bus');
-        $bus->dispatch(new OrderMessage('OrderComponent\\Event\\Order\\OrderPlacedEvent', $o->getId()));
+        $bus->dispatch(new OrderMessage('OrderComponent\Event\Order\OrderPlacedEvent', $o->getId()));
 
-        $count = (int)$em->createQuery('SELECT COUNT(k.key) FROM OrderComponent\\Entity\\Outbox\\IdempotencyKey k')->getSingleScalarResult();
+        $count = (int)$em->createQuery('SELECT COUNT(k.key) FROM OrderComponent\Entity\Outbox\IdempotencyKey k')->getSingleScalarResult();
         $this->assertSame(1, $count, 'Idempotency stored only once');
     }
 }

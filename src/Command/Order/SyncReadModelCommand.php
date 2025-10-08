@@ -15,7 +15,7 @@ use OrderComponent\ReadModel\Entity\OrderView;
 #[AsCommand(name: 'order:readmodel:sync', description: 'Recalculate OrderView for all or a single order')]
 final class SyncReadModelCommand extends Command
 {
-    public function __construct(private EntityManagerInterface $em, private OrderReadModelUpdater $updater) { parent::__construct(); }
+    public function __construct(private readonly EntityManagerInterface $em, private readonly OrderReadModelUpdater $updater) { parent::__construct(); }
 
     protected function configure(): void
     {

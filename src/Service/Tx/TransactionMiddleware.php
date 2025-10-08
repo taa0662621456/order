@@ -2,13 +2,19 @@
 declare(strict_types=1);
 namespace OrderComponent\Service\Tx;
 use Doctrine\ORM\EntityManagerInterface;
-final class TransactionMiddleware
+use Throwable;
+
+final readonly class TransactionMiddleware
 {
-    public function __construct(private readonly EntityManagerInterface $em){}
+    public function __construct(private EntityManagerInterface $em){}
+
     /**
      * @template T
      * @param callable(EntityManagerInterface):T $fn
      * @return T
+     * @throws \Throwable
+     * @throws \Throwable
+     * @throws \Throwable
      */
     public function run(callable $fn)
     {
@@ -18,7 +24,7 @@ final class TransactionMiddleware
             $this->em->flush();
             $this->em->commit();
             return $result;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->em->rollback();
             throw $e;
         }

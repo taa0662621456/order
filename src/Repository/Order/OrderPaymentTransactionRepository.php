@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\OrderPaymentTransaction;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderPaymentTransactionRepositoryInterface;
 
-final class OrderPaymentTransactionRepository implements OrderPaymentTransactionRepositoryInterface
+final readonly class OrderPaymentTransactionRepository implements OrderPaymentTransactionRepositoryInterface
 {
     public function __construct(private EntityManagerInterface $em) {}
 

@@ -5,7 +5,11 @@ namespace OrderComponent\Interface\ServiceInterface\Order;
 
 final class OrderAuditTrail
 {
-    /** @param list<array{eventId:string,eventName:string,occurredAt:string,payload:array}> $events */
+    /**
+     * @param string $orderId
+     * @param int $totalEvents
+     * @param array $events
+     */
     public function __construct(
         public string $orderId,
         public int $totalEvents,

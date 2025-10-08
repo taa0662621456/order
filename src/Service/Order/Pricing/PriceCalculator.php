@@ -5,13 +5,13 @@ namespace OrderComponent\Service\Order\Pricing;
 
 use OrderComponent\ValueObject\Order\{Money, Currency, TaxRate};
 
-final class PriceCalculator
+final readonly class PriceCalculator
 {
     public function __construct(
-        private readonly PromotionStrategyInterface $promotions,
-        private readonly TaxationStrategyInterface $taxation,
-        private readonly TaxationConfigLoader $taxConfig,
-        private readonly CurrencyConversionService $fx,
+        private PromotionStrategyInterface $promotions,
+        private TaxationStrategyInterface  $taxation,
+        private TaxationConfigLoader       $taxConfig,
+        private CurrencyConversionService  $fx,
     ) {}
 
     /**

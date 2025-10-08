@@ -10,11 +10,11 @@ use OrderComponent\Service\Order\Adapter\Payment\PaymentGatewayInterface;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 
 #[AsMessageHandler]
-final class OrderPartialPaymentCommandHandler
+final readonly class OrderPartialPaymentCommandHandler
 {
     public function __construct(
-        private PartialPaymentService $service,
-        private PaymentGatewayInterface $gateway,
+        private PartialPaymentService       $service,
+        private PaymentGatewayInterface     $gateway,
         private TransactionalEventPublisher $publisher
     ) {}
 

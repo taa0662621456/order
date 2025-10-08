@@ -9,7 +9,7 @@ use OrderComponent\Service\Order\RefundService;
 use OrderComponent\Service\Order\TransactionalEventPublisher;
 
 #[AsMessageHandler]
-final class OrderRefundCommandHandler
+final readonly class OrderRefundCommandHandler
 {
     public function __construct(private RefundService $service, private TransactionalEventPublisher $publisher) {}
 

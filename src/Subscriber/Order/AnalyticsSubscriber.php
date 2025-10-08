@@ -6,9 +6,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Analytics\AnalyticsRecord;
 use OrderComponent\Event\Order\OrderPaidEvent;
 
-final class AnalyticsSubscriber implements EventSubscriberInterface
+final readonly class AnalyticsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em) {}
     public static function getSubscribedEvents(): array { return [OrderPaidEvent::class => 'onPaid']; }
     public function onPaid(OrderPaidEvent $e): void { $this->em->persist(new AnalyticsRecord('paid', $e->orderId)); $this->em->flush(); }
 }

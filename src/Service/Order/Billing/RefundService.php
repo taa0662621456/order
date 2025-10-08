@@ -7,10 +7,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Entity\Order\Order;
 use OrderComponent\Entity\Order\Billing\OrderRefundTransaction;
 
-final class RefundService
+final readonly class RefundService
 {
-    public function __construct(private readonly EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em) {}
 
+    /**
+     * @throws \Exception
+     */
     public function refund(Order $order, string $amount, string $currency = 'USD'): OrderRefundTransaction
     {
         $txn = new OrderRefundTransaction($order, 'rf_' . bin2hex(random_bytes(8)), $amount, $currency);

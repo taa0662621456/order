@@ -7,6 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class PaymentWebhookTest extends WebTestCase
 {
+    /**
+     * @throws \JsonException
+     */
     public function test_payment_webhook_happy_path(): void
     {
         $client = static::createClient();
@@ -31,6 +34,9 @@ final class PaymentWebhookTest extends WebTestCase
         self::assertEquals('ok', $json['status'] ?? null);
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function test_payment_webhook_duplicate_is_ignored(): void
     {
         $client = static::createClient();

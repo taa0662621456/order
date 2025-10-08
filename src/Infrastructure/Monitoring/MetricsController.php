@@ -6,7 +6,7 @@ namespace OrderComponent\Infrastructure\Monitoring;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class MetricsController
+final readonly class MetricsController
 {
     public function __construct(private MetricsCollector $collector) {}
 

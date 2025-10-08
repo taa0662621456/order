@@ -5,10 +5,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use OrderComponent\Entity\Outbox\OutboxMessage;
 
-final class OutboxProcessor
+final readonly class OutboxProcessor
 {
-    public function __construct(private readonly EntityManagerInterface $em, private readonly EventDispatcherInterface $dispatcher) {}
+    public function __construct(private EntityManagerInterface $em, private EventDispatcherInterface $dispatcher) {}
 
+    /**
+     * @throws \JsonException
+     */
     public function process(int $limit = 100): int
     {
         $repo = $this->em->getRepository(OutboxMessage::class);

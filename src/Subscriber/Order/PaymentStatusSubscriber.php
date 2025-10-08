@@ -4,8 +4,8 @@ namespace OrderComponent\Subscriber\Order;
 use OrderComponent\Event\Order\{OrderPartiallyPaidEvent, OrderFullyPaidEvent, OrderPartiallyRefundedEvent};
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-class PaymentStatusSubscriber implements EventSubscriberInterface {
-    public function __construct(private readonly LoggerInterface $logger){}
+readonly class PaymentStatusSubscriber implements EventSubscriberInterface {
+    public function __construct(private LoggerInterface $logger){}
     public static function getSubscribedEvents(): array {
         return [
             OrderPartiallyPaidEvent::class => 'onPartiallyPaid',

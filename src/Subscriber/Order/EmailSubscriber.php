@@ -8,8 +8,8 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'OrderComponent\\Event\\Order\\OrderPaidEvent' => 'onPaid',
-            'OrderComponent\\Event\\Order\\OrderShippedEvent' => 'onShipped'
+            'OrderComponent\Event\Order\OrderPaidEvent' => 'onPaid',
+            'OrderComponent\Event\Order\OrderShippedEvent' => 'onShipped'
         ];
     }
     public function onPaid(object $event): void { /* send email */ }

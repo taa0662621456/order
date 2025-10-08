@@ -15,6 +15,9 @@ final class DlqRequeueCommand extends Command
 {
     public function __construct(private readonly ReceiverInterface $failed, private readonly SenderInterface $async) { parent::__construct(); }
 
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

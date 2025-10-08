@@ -9,7 +9,10 @@ interface OutboxRepositoryInterface
 {
     public function add(OutboxMessage $message): void;
 
-    /** @return iterable<OutboxMessage> */
+    /**
+     * @param int $limit
+     * @return iterable<OutboxMessage>
+     */
     public function pullPending(int $limit = 50): iterable;
 
     public function markSent(OutboxMessage $message): void;

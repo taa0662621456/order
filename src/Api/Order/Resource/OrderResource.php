@@ -20,21 +20,21 @@ use OrderComponent\Api\Order\State\OrderDeleteProcessor;
 
 #[ApiResource(
     shortName: 'Order',
-    normalizationContext: ['groups' => ['order:read']],
-    denormalizationContext: ['groups' => ['order:write']],
-    graphQlOperations: [
-        new Query(name: 'item'),
-        new Query(name: 'collection'),
-        new Mutation(name: 'place', args: ['input' => ['type' => 'OrderPlaceInput']], resolver: OrderPlaceProcessor::class),
-    ],
-    provider: OrderProvider::class,
     operations: [
         new Get(),
         new GetCollection(),
         new Post(processor: OrderPlaceProcessor::class),
         new Patch(processor: OrderPatchProcessor::class),
         new Delete(processor: OrderDeleteProcessor::class),
-    ]
+    ],
+    normalizationContext: ['groups' => ['order:read']],
+    denormalizationContext: ['groups' => ['order:write']],
+    graphQlOperations: [
+        new Query(name: 'item'),
+        new Query(name: 'collection'),
+        new Mutation(resolver: OrderPlaceProcessor::class, args: ['input' => ['type' => 'OrderPlaceInput']], name: 'place'),
+    ],
+    provider: OrderProvider::class
 )]
 final class OrderResource
 {
@@ -65,7 +65,7 @@ final class OrderResource
     #[Groups(['order:read'])]
     public ?string $vendorId = null;
 
-    /** @var list<OrderItemInput> */
+    /** @var array */
     #[Groups(['order:write'])]
     #[Assert\Valid]
     public array $items = [];

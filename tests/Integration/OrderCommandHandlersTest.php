@@ -26,6 +26,9 @@ final class OrderCommandHandlersTest extends TestCase
         $this->em = $kernel->getContainer()->get(EntityManagerInterface::class);
     }
 
+    /**
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
     public function testCreateAndPayProducesOutbox(): void
     {
         $create = new OrderCreateHandler($this->em);

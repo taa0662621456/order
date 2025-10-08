@@ -9,11 +9,11 @@ use OrderComponent\Interface\RepositoryInterface\Order\OutboxRepositoryInterface
 use OrderComponent\Entity\Order\OutboxMessage;
 use OrderComponent\Message\Order\OrderDomainMessage;
 
-final class TransactionalEventPublisher
+final readonly class TransactionalEventPublisher
 {
     public function __construct(
         private OutboxRepositoryInterface $outbox,
-        private MessageBusInterface $bus
+        private MessageBusInterface       $bus
     ) {}
 
     public function publish(string $topic, array $payload): string
@@ -25,6 +25,9 @@ final class TransactionalEventPublisher
         return $messageId;
     }
 
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     public function relay(OutboxMessage $m): void
     {
         $this->bus->dispatch(new OrderDomainMessage($m->messageId(), $m->topic(), $m->payload()));

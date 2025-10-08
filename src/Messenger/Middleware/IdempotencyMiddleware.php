@@ -13,16 +13,20 @@ interface IdempotencyStoreInterface {
 }
 
 final class InMemoryIdempotencyStore implements IdempotencyStoreInterface {
-    /** @var array<string,bool> */
+    /** @var array */
     private array $store = [];
     public function has(string $key): bool { return isset($this->store[$key]); }
     public function put(string $key): void { $this->store[$key] = true; }
 }
 
-final class IdempotencyMiddleware implements MiddlewareInterface
+final readonly class IdempotencyMiddleware implements MiddlewareInterface
 {
     public function __construct(private IdempotencyStoreInterface $store) {}
 
+    /**
+     * @throws \JsonException
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $key = $this->makeKey($envelope->getMessage());
@@ -33,6 +37,9 @@ final class IdempotencyMiddleware implements MiddlewareInterface
         return $stack->next()->handle($envelope, $stack);
     }
 
+    /**
+     * @throws \JsonException
+     */
     private function makeKey(object $message): string
     {
         $data = ['class' => $message::class, 'props' => get_object_vars($message)];

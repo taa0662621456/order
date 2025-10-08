@@ -21,7 +21,7 @@ final class PriceCalculatorTest extends TestCase
 
         $calc = new PriceCalculator($promos, $taxation, $config, $fx);
         $rate = $config->rateFor('EU', 'DE'); // 19%
-        $breakdown = $calc->calculate($subtotal, $rate, null);
+        $breakdown = $calc->calculate($subtotal, $rate);
 
         $this->assertArrayHasKey('total', $breakdown);
         $this->assertSame('162.000000', $breakdown['tax']->getAmount()); // 200 * 0.9 = 180; tax 19% = 34.2 → rounded 34.20; (kept 6dp internal)

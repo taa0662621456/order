@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Service\Order\Adapter\Payment;
 
-final class StripeGateway implements PaymentGatewayInterface
+final readonly class StripeGateway implements PaymentGatewayInterface
 {
     public function __construct(private ?string $apiKey = null) {}
 

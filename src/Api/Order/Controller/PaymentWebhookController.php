@@ -10,13 +10,16 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use OrderComponent\Service\Order\WebhookIdempotencyService;
 use OrderComponent\Message\Order\OrderPartialPaymentCommand;
 
-final class PaymentWebhookController
+final readonly class PaymentWebhookController
 {
     public function __construct(
         private WebhookIdempotencyService $idem,
-        private MessageBusInterface $bus
+        private MessageBusInterface       $bus
     ) {}
 
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
     #[Route('/webhooks/payment', name: 'order_payment_webhook', methods: ['POST'])]
     public function __invoke(Request $req): JsonResponse
     {

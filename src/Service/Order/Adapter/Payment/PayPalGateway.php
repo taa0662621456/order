@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Service\Order\Adapter\Payment;
 
-final class PayPalGateway implements PaymentGatewayInterface
+final readonly class PayPalGateway implements PaymentGatewayInterface
 {
     public function __construct(private ?string $clientId = null, private ?string $secret = null) {}
 

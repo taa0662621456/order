@@ -10,14 +10,18 @@ use OrderComponent\Api\Order\Resource\OrderResource;
 use OrderComponent\Message\Order\OrderCancelCommand;
 use OrderComponent\Message\Order\OrderPaymentCommand;
 use OrderComponent\Message\Order\OrderShipmentCommand;
+use function assert;
 
-final class OrderPatchProcessor implements ProcessorInterface
+final readonly class OrderPatchProcessor implements ProcessorInterface
 {
     public function __construct(private MessageBusInterface $bus) {}
 
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     */
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): \OrderResource
     {
-        \assert($data instanceof OrderResource);
+        assert($data instanceof OrderResource);
         $id = $uriVariables['id'] ?? $data->id ?? null;
         if (!$id) { return $data; }
 

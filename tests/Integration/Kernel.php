@@ -5,6 +5,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use OrderComponent\OrderComponentBundle;
+use function dirname;
 
 final class TestKernel extends Kernel
 {
@@ -14,7 +15,7 @@ final class TestKernel extends Kernel
         $c->import('%kernel.project_dir%/config/packages/framework_workflow.php');
         $c->import('%kernel.project_dir%/config/packages/test/messenger.yaml');
         $c->extension('framework', ['secret'=>'test','test'=>true]);
-        $c->extension('doctrine', ['dbal'=>['url'=>'sqlite:///%kernel.cache_dir%/test.db'], 'orm'=>['auto_mapping'=>true,'mappings'=>{'OrderComponent':{'is_bundle':False,'type':'attribute','dir':'%kernel.project_dir%/src/Entity','prefix':'OrderComponent\\Entity'}}]]);
+        $c->extension('doctrine', ['dbal'=>['url'=>'sqlite:///%kernel.cache_dir%/test.db'], 'orm'=>['auto_mapping'=>true,'mappings'=>{'OrderComponent':{'is_bundle':False,'type':'attribute','dir':'%kernel.project_dir%/src/Entity','prefix':'OrderComponent\Entity'}}]])
     }
-    public function getProjectDir(): string { return \dirname(__DIR__, 3); }
+    public function getProjectDir(): string { return dirname(__DIR__, 3); }
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Service\Order\Pricing;
 
-use Symfony\Component\Yaml\Yaml;
+use RectorPrefix202411\Symfony\Component\Yaml\Yaml;
 use OrderComponent\ValueObject\Order\TaxRate;
 
 final class TaxationConfigLoader

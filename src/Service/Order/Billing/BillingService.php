@@ -9,11 +9,11 @@ use OrderComponent\Entity\Order\Order;
 use OrderComponent\Entity\Order\Billing\{OrderInvoice, OrderPaymentIntent, OrderTransaction};
 use OrderComponent\ValueObject\Order\InvoiceNumber;
 
-final class BillingService implements BillingServiceInterface
+final readonly class BillingService implements BillingServiceInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly PaymentProcessor $processor,
+        private EntityManagerInterface $em,
+        private PaymentProcessor       $processor,
     ) {}
 
     public function generateInvoice(Order $order): OrderInvoice
@@ -27,6 +27,9 @@ final class BillingService implements BillingServiceInterface
         return $invoice;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function createPaymentIntent(Order $order, string $amount): OrderPaymentIntent
     {
         $intentId = $this->processor->createIntentId();
@@ -36,6 +39,9 @@ final class BillingService implements BillingServiceInterface
         return $intent;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function capturePayment(OrderPaymentIntent $intent): OrderTransaction
     {
         $txn = $this->processor->capture($intent);

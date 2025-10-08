@@ -1,16 +1,21 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Integration;
+namespace Tests\Order\Integration;
 
 use OrderComponent\Messenger\Middleware\IdempotencyMiddleware;
 use OrderComponent\Messenger\Middleware\InMemoryIdempotencyStore;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Middleware\StackMiddleware;
 
 final class IdempotencyMiddlewareTest extends TestCase
 {
+    /**
+     * @throws \Symfony\Component\Messenger\Exception\ExceptionInterface
+     * @throws \JsonException
+     */
     public function testDuplicateMessageDoesNotPassTwice(): void
     {
         $store = new InMemoryIdempotencyStore();
@@ -20,7 +25,7 @@ final class IdempotencyMiddlewareTest extends TestCase
         $next = new class($calls) extends StackMiddleware {
             public int $calls = 0;
             public function __construct(int &$ref) { $this->ref =& $ref; }
-            public function handle(Envelope $envelope, callable $next = null): Envelope {
+            public function handle(Envelope $envelope, callable|StackInterface $next = null): Envelope {
                 $this->ref++;
                 return $envelope;
             }

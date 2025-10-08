@@ -8,10 +8,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use OrderComponent\Service\Order\Billing\WebhookHandler;
 
-final class PaymentWebhookController
+final readonly class PaymentWebhookController
 {
-    public function __construct(private readonly WebhookHandler $handler) {}
+    public function __construct(private WebhookHandler $handler) {}
 
+    /**
+     * @throws \Exception
+     */
     #[Route(path: '/api/webhooks/payment', name: 'order_payment_webhook', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {

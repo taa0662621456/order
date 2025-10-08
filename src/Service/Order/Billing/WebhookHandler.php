@@ -8,13 +8,16 @@ use OrderComponent\Entity\Order\Billing\{OrderPaymentIntent, OrderTransaction};
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-final class WebhookHandler
+final readonly class WebhookHandler
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly IdempotencyGuard $guard,
+        private EntityManagerInterface $em,
+        private IdempotencyGuard       $guard,
     ) {}
 
+    /**
+     * @throws \Exception
+     */
     public function handlePayment(Request $request): array
     {
         $provider = $request->headers->get('X-Provider', 'mock');
@@ -50,6 +53,9 @@ final class WebhookHandler
         return ['status' => 'ok'];
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handleRefund(Request $request): array
     {
         // For brevity: re-use handlePayment shape

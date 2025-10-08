@@ -9,11 +9,11 @@ use OrderComponent\Entity\Order;
 use OrderComponent\Event\Order\{OrderPlacedEvent,OrderPaidEvent,OrderShippedEvent,OrderCancelledEvent,OrderRefundedEvent};
 
 #[AsMessageHandler]
-final class OrderMessageHandler
+final readonly class OrderMessageHandler
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly EntityManagerInterface $em
+        private EventDispatcherInterface $dispatcher,
+        private EntityManagerInterface   $em
     ) {}
 
     public function __invoke(OrderMessage $m): void

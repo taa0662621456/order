@@ -12,10 +12,10 @@ use OrderComponent\Service\Outbox\OutboxWriter;
 
 final class DomainEventsToOutboxSubscriber implements EventSubscriber
 {
-    /** @var list<array{topic:string,payload:array}> */
+    /** @var array */
     private array $buffer = [];
 
-    public function __construct(private OutboxWriter $outbox) {}
+    public function __construct(private readonly OutboxWriter $outbox) {}
 
     public function getSubscribedEvents(): array
     {
@@ -43,6 +43,9 @@ final class DomainEventsToOutboxSubscriber implements EventSubscriber
         }
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         if (!$this->buffer) {

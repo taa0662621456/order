@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use OrderComponent\Interface\ServiceInterface\Order\OrderAuditTrailBuilderInterface;
 
-final class OrderAuditAction
+final readonly class OrderAuditAction
 {
     public function __construct(private OrderAuditTrailBuilderInterface $builder) {}
 

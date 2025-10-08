@@ -8,7 +8,13 @@ use OrderComponent\Entity\Order\OrderEventRecord;
 interface OrderEventRepositoryInterface
 {
     public function save(OrderEventRecord $record): void;
-    /** @return iterable<OrderEventRecord> */
+
+    /**
+     * @param string $orderId
+     * @param int $limit
+     * @param int $offset
+     * @return iterable<OrderEventRecord>
+     */
     public function findByOrder(string $orderId, int $limit = 100, int $offset = 0): iterable;
     public function findLastByOrder(string $orderId): ?OrderEventRecord;
     public function existsByEventId(string $eventId): bool;

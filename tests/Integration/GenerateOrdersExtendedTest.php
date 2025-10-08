@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\Application;
@@ -24,7 +25,7 @@ final class GenerateOrdersExtendedTest extends TestCase
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $schemaTool = new SchemaTool($em);
         $schemaTool->dropDatabase();
         $schemaTool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
@@ -53,10 +54,10 @@ final class GenerateOrdersExtendedTest extends TestCase
         $this->assertStringContainsString('Payment amount: $1500', $out);
         $this->assertStringContainsString('Payment total: $6000 (Общий платёж: $6000)', $out);
 
-        $orders = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\\Entity\\Order o')->getSingleScalarResult();
-        $payments = (int)$em->createQuery('SELECT COUNT(p.id) FROM OrderComponent\\Entity\\Order\\OrderPayment p')->getSingleScalarResult();
-        $shipments = (int)$em->createQuery('SELECT COUNT(s.id) FROM OrderComponent\\Entity\\Order\\OrderShipment s')->getSingleScalarResult();
-        $sum = (int)$em->createQuery('SELECT COALESCE(SUM(p.amount),0) FROM OrderComponent\\Entity\\Order\\OrderPayment p')->getSingleScalarResult();
+        $orders = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\Entity\Order o')->getSingleScalarResult();
+        $payments = (int)$em->createQuery('SELECT COUNT(p.id) FROM OrderComponent\Entity\Order\OrderPayment p')->getSingleScalarResult();
+        $shipments = (int)$em->createQuery('SELECT COUNT(s.id) FROM OrderComponent\Entity\Order\OrderShipment s')->getSingleScalarResult();
+        $sum = (int)$em->createQuery('SELECT COALESCE(SUM(p.amount),0) FROM OrderComponent\Entity\Order\OrderPayment p')->getSingleScalarResult();
 
         $this->assertSame(4, $orders);
         $this->assertSame(4, $payments);

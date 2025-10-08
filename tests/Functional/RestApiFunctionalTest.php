@@ -1,5 +1,6 @@
 <?php
 namespace OrderComponent\Tests\Functional;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -10,10 +11,14 @@ final class RestApiFunctionalTest extends TestCase
     private static KernelInterface $kernel; private static KernelBrowser $client;
     public static function setUpBeforeClass(): void { self::$kernel=new TestKernel('test', true); self::$kernel->boot(); self::$client=new KernelBrowser(self::$kernel); }
     public static function tearDownAfterClass(): void { self::$kernel->shutdown(); }
+
+    /**
+     * @throws \JsonException
+     */
     public function testCreatePayShipFlow(): void
     {
         $c=self::$kernel->getContainer(); $em=$c->get(EntityManagerInterface::class);
-        $tool=new \Doctrine\ORM\Tools\SchemaTool($em); $tool->dropDatabase(); $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
+        $tool=new SchemaTool($em); $tool->dropDatabase(); $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
         $payload=json_encode(['currency'=>'USD','items'=>[['sku'=>'SKU-1','quantity'=>2,'unitPrice'=>1000],['sku'=>'SKU-2','quantity'=>1,'unitPrice'=>5000]]], JSON_THROW_ON_ERROR);
         self::$client->request('POST','/orders',[],[],['CONTENT_TYPE'=>'application/json'],$payload);

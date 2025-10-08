@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use OrderComponent\OrderComponentBundle;
+use function dirname;
 
 final class TestKernel extends Kernel
 {
@@ -25,11 +26,11 @@ final class TestKernel extends Kernel
                         'is_bundle': False,
                         'type': 'attribute',
                         'dir': '%kernel.project_dir%/src/Entity',
-                        'prefix': 'OrderComponent\\Entity'
+                        'prefix': 'OrderComponent\Entity'
                     }
                 }
             ]
-        ]);
+        ])
     }
-    public function getProjectDir(): string { return \dirname(__DIR__, 3); }
+    public function getProjectDir(): string { return dirname(__DIR__, 3); }
 }

@@ -9,7 +9,7 @@ return static function (ContainerConfigurator $c): void {
                 'sync' => ['dsn' => 'sync://']
             ],
             'routing' => [
-                'OrderComponent\\Message\\OrderMessage' => 'sync'
+                'OrderComponent\Message\OrderMessage' => 'sync'
             ]
         ]
     ]);

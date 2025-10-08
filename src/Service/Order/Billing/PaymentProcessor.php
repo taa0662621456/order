@@ -7,11 +7,17 @@ use OrderComponent\Entity\Order\Billing\{OrderPaymentIntent, OrderTransaction};
 
 final class PaymentProcessor
 {
+    /**
+     * @throws \Exception
+     */
     public function createIntentId(): string
     {
         return 'pi_' . bin2hex(random_bytes(8));
     }
 
+    /**
+     * @throws \Exception
+     */
     public function capture(OrderPaymentIntent $intent): OrderTransaction
     {
         // NOTE: mock интеграция

@@ -8,6 +8,9 @@ use OrderComponent\ValueObject\Order\OrderStatus;
 use OrderComponent\ValueObject\Order\VendorId;
 use OrderComponent\RepositoryInterface\Order\OrderRepositoryInterface;
 
+/**
+ * @property $_em
+ */
 final class OrderRepository extends ServiceEntityRepository implements OrderRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry){ parent::__construct($registry, Order::class); }

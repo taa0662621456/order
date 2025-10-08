@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use OrderComponent\Service\Tx\TransactionMiddleware;
@@ -13,11 +15,14 @@ final class TransactionMiddlewareTest extends TestCase
     public static function setUpBeforeClass(): void { self::$kernel = new TestKernel('test', true); self::$kernel->boot(); }
     public static function tearDownAfterClass(): void { self::$kernel->shutdown(); }
 
+    /**
+     * @throws \Throwable
+     */
     public function testRollbackOnException(): void
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $tool = new SchemaTool($em);
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
@@ -27,12 +32,12 @@ final class TransactionMiddlewareTest extends TestCase
             $tx->run(function(EntityManagerInterface $em){
                 $o = new Order();
                 $em->persist($o);
-                throw new \RuntimeException('boom');
+                throw new RuntimeException('boom');
             });
             $this->fail('Exception expected');
-        } catch (\RuntimeException $e) { /* ok */ }
+        } catch (RuntimeException $e) { /* ok */ }
 
-        $count = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\\Entity\\Order o')->getSingleScalarResult();
+        $count = (int)$em->createQuery('SELECT COUNT(o.id) FROM OrderComponent\Entity\Order o')->getSingleScalarResult();
         $this->assertSame(0, $count, 'Order must not be persisted after rollback');
     }
 }

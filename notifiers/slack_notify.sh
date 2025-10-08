@@ -4,9 +4,9 @@ MSG="${1:-"CI failure"}"
 EMOJI="${CI_FAILURE_EMOJI:-":x:"}"
 URL="${SLACK_WEBHOOK_URL:-}"
 [ -z "$URL" ] && { echo "SLACK_WEBHOOK_URL is not set"; exit 1; }
-TAIL=""; 
+TAIL="";
 if [ -f "$GITHUB_WORKSPACE/job.log" ]; then
-  TAIL=$(tail -n 40 "$GITHUB_WORKSPACE/job.log" | sed 's/"/\\"/g')
+  TAIL=$(tail -n 40 "$GITHUB_WORKSPACE/job.log" | sed 's/"/\"/g')
 fi
 PAYLOAD=$(cat <<JSON
 {

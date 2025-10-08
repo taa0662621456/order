@@ -18,6 +18,6 @@ class AnalyticsRecord
     #[ORM\Column(type: 'integer')]
     private int $orderId;
 
-    public function __construct(string $type, int $orderId)
+    public function __construct(string $type, string $orderId)
     { $this->type=$type; $this->orderId=$orderId; }
 }

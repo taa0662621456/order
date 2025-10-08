@@ -12,7 +12,7 @@ use OrderComponent\Service\Order\OutboxRelay;
 #[AsCommand(name: 'order:outbox:relay', description: 'Dispatch messages from outbox to Messenger')]
 final class OutboxRelayCommand extends Command
 {
-    public function __construct(private OutboxRelay $relay) { parent::__construct(); }
+    public function __construct(private readonly OutboxRelay $relay) { parent::__construct(); }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

@@ -8,7 +8,11 @@ use OrderComponent\Entity\Order\OrderRefundTransaction;
 interface OrderRefundTransactionRepositoryInterface
 {
     public function add(OrderRefundTransaction $tx): void;
-    /** @return iterable<OrderRefundTransaction> */
+
+    /**
+     * @param string $orderId
+     * @return iterable<OrderRefundTransaction>
+     */
     public function findByOrder(string $orderId): iterable;
     public function sumByOrder(string $orderId): string;
 }

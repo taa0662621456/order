@@ -12,6 +12,10 @@ use OrderComponent\Service\Outbox\OutboxProcessor;
 final class OutboxProcessCommand extends Command
 {
     public function __construct(private readonly OutboxProcessor $proc) { parent::__construct(); }
+
+    /**
+     * @throws \JsonException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

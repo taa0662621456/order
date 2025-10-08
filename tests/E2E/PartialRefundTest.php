@@ -15,7 +15,7 @@ final class PartialRefundTest extends TestCase
         $this->assertSame('paid', $o->status());
         $o->refundPartial('25.00', 'part damage');
         $this->assertSame('partially_refunded', $o->status());
-        $o->refundPartial('75.00', null);
+        $o->refundPartial('75.00');
         $this->assertSame('refunded', $o->status());
     }
 }

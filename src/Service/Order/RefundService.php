@@ -6,11 +6,12 @@ namespace OrderComponent\Service\Order;
 use OrderComponent\Entity\Order\OrderRefundTransaction;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderRefundTransactionRepositoryInterface;
 use OrderComponent\Service\Order\Adapter\Payment\PaymentGatewayInterface;
+use RuntimeException;
 
-final class RefundService
+final readonly class RefundService
 {
     public function __construct(
-        private PaymentGatewayInterface $gateway,
+        private PaymentGatewayInterface                   $gateway,
         private OrderRefundTransactionRepositoryInterface $refunds
     ) {}
 
@@ -18,7 +19,7 @@ final class RefundService
     {
         // реальный вызов провайдера должен возвращать refundId
         if (!method_exists($this->gateway, 'refund')) {
-            throw new \RuntimeException('Gateway does not support refunds');
+            throw new RuntimeException('Gateway does not support refunds');
         }
         $refundId = $this->gateway->refund($orderId, $amount, ['reason' => $reason]);
         $tx = new OrderRefundTransaction($orderId, $amount, $refundId, $reason);

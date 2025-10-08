@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace OrderComponent\Entity\Order;
 
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -29,15 +30,15 @@ class OrderEventRecord
     private array $payload;
 
     #[ORM\Column(name: 'occurred_at')]
-    private \DateTimeImmutable $occurredAt;
+    private DateTimeImmutable $occurredAt;
 
-    public function __construct(string $eventId, string $orderId, string $eventName, array $payload, ?\DateTimeImmutable $occurredAt = null)
+    public function __construct(string $eventId, string $orderId, string $eventName, array $payload, ?DateTimeImmutable $occurredAt = null)
     {
         $this->eventId = $eventId;
         $this->orderId = $orderId;
         $this->eventName = $eventName;
         $this->payload = $payload;
-        $this->occurredAt = $occurredAt ?? new \DateTimeImmutable();
+        $this->occurredAt = $occurredAt ?? new DateTimeImmutable();
     }
 
     public function id(): int { return $this->id; }
@@ -45,5 +46,5 @@ class OrderEventRecord
     public function orderId(): string { return $this->orderId; }
     public function eventName(): string { return $this->eventName; }
     public function payload(): array { return $this->payload; }
-    public function occurredAt(): \DateTimeImmutable { return $this->occurredAt; }
+    public function occurredAt(): DateTimeImmutable { return $this->occurredAt; }
 }

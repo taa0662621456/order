@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace OrderComponent\Tests\Integration;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,7 +27,7 @@ final class OrderWorkflowTest extends TestCase
     {
         $c = self::$kernel->getContainer();
         $em = $c->get(EntityManagerInterface::class);
-        $tool = new \Doctrine\ORM\Tools\SchemaTool($em);
+        $tool = new SchemaTool($em);
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
@@ -38,7 +39,7 @@ final class OrderWorkflowTest extends TestCase
         $svc->ship($order);
 
         // outbox has 3 messages
-        $count = (int)$em->createQuery('SELECT COUNT(m.id) FROM OrderComponent\\Entity\\Outbox\\OutboxMessage m')->getSingleScalarResult();
+        $count = (int)$em->createQuery('SELECT COUNT(m.id) FROM OrderComponent\Entity\Outbox\OutboxMessage m')->getSingleScalarResult();
         $this->assertSame(3, $count);
 
         // validate event names in outbox payloads

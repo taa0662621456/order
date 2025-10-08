@@ -23,6 +23,9 @@ final class Kernel extends BaseKernel
         ];
     }
 
+    /**
+     * @throws \Exception
+     */
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $confDir = __DIR__ . '/../config/packages';

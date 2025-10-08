@@ -8,6 +8,9 @@ use Symfony\Component\Config\FileLocator;
 
 final class OrderComponentExtension extends Extension
 {
+    /**
+     * @throws \Exception
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

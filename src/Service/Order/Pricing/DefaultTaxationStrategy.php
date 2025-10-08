@@ -10,7 +10,6 @@ final class DefaultTaxationStrategy implements TaxationStrategyInterface
 {
     public function tax(Money $taxBase, TaxRate $rate): Money
     {
-        $amount = $taxBase->multiply($rate->asDecimal());
-        return $amount;
+        return $taxBase->multiply($rate->asDecimal());
     }
 }

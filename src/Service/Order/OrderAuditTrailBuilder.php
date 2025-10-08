@@ -6,15 +6,16 @@ namespace OrderComponent\Service\Order;
 use OrderComponent\Interface\ServiceInterface\Order\OrderAuditTrail;
 use OrderComponent\Interface\ServiceInterface\Order\OrderAuditTrailBuilderInterface;
 use OrderComponent\Interface\RepositoryInterface\Order\OrderEventRepositoryInterface;
+use function count;
 
-final class OrderAuditTrailBuilder implements OrderAuditTrailBuilderInterface
+final readonly class OrderAuditTrailBuilder implements OrderAuditTrailBuilderInterface
 {
     public function __construct(private OrderEventRepositoryInterface $repo) {}
 
     public function buildForOrder(string $orderId): OrderAuditTrail
     {
         $events = [];
-        foreach ($this->repo->findByOrder($orderId, 1000, 0) as $e) {
+        foreach ($this->repo->findByOrder($orderId, 1000) as $e) {
             $events[] = [
                 'eventId' => $e->eventId(),
                 'eventName' => $e->eventName(),
@@ -22,6 +23,6 @@ final class OrderAuditTrailBuilder implements OrderAuditTrailBuilderInterface
                 'payload' => $e->payload(),
             ];
         }
-        return new OrderAuditTrail($orderId, \count($events), $events);
+        return new OrderAuditTrail($orderId, count($events), $events);
     }
 }
